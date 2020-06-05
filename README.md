@@ -65,10 +65,12 @@ noble.on('discover', async (peripheral) => {
 #### Linux
 
  * Kernel version 3.6 or above
- * `libbluetooth-dev`
- * Run the following command to grant node the necessary privileges to read BLE data: `sudo setcap cap_net_raw+eip $(eval readlink -f $(which node))` ([Explanation](https://github.com/abandonware/noble#running-without-rootsudo-linux-specific))
+ * `libbluetooth-dev` needs to be installed. For instructions for specific distributions, see below.
+ * To set the necessarilly privileges to run without sudo, [see this section](https://github.com/abandonware/noble#running-without-rootsudo-linux-specific). This is required for all distributions (Raspbian, Ubuntu, Fedora, etc). You will not get any errors if running without sudo, but nothing will happen.
 
 ##### Ubuntu, Debian, Raspbian
+
+See the [generic Linux notes above](https://github.com/abandonware/noble/blob/master/README.md#linux) first.
 
 ```sh
 sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev
@@ -80,11 +82,15 @@ Make sure `node` is on your `PATH`. If it's not, some options:
 
 ##### Fedora and other RPM-based distributions
 
+See the [generic Linux notes above](https://github.com/abandonware/noble/blob/master/README.md#linux) first.
+
 ```sh
 sudo yum install bluez bluez-libs bluez-libs-devel
 ```
 
 ##### Intel Edison
+
+See the [generic Linux notes above](https://github.com/abandonware/noble/blob/master/README.md#linux) first.
 
 See [Configure Intel Edison for Bluetooth LE (Smart) Development](http://rexstjohn.com/configure-intel-edison-for-bluetooth-le-smart-development/).
 
