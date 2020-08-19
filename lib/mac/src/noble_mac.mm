@@ -141,12 +141,18 @@ Napi::Value NobleMac::Read(const Napi::CallbackInfo& info) {
 // write(deviceUuid, serviceUuid, characteristicUuid, data, withoutResponse)
 Napi::Value NobleMac::Write(const Napi::CallbackInfo& info) {
     CHECK_MANAGER()
-    ARG5(String, String, String, Buffer, Boolean)
+    ARG4(String, String, String, Buffer)
     auto uuid = napiToUuidString(info[0].As<Napi::String>());
     auto service = napiToUuidString(info[1].As<Napi::String>());
     auto characteristic = napiToUuidString(info[2].As<Napi::String>());
     auto data = napiToData(info[3].As<Napi::Buffer<Byte>>());
     auto withoutResponse = info[4].As<Napi::Boolean>().Value();
+
+    auto withoutResponse = false;
+    if(info[4] && !(info[4].IsNull() || info[4].IsUndefined())) {
+        withoutResponse = info[4].As<Napi::Boolean>().Value();
+    }
+
     [manager write:uuid service:service characteristic:characteristic data:data withoutResponse:withoutResponse];
     return Napi::Value();
 }
