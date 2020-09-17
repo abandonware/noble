@@ -727,7 +727,7 @@ Become a sponsor and get your logo on our README on Github with a link to your s
 ## Useful links
 
  * [Bluetooth Development Portal](http://developer.bluetooth.org)
-   * [GATT Specifications](http://developer.bluetooth.org/gatt/Pages/default.aspx)
+   * [GATT Specifications](https://www.bluetooth.com/specifications/gatt/)
  * [Bluetooth: ATT and GATT](http://epx.com.br/artigos/bluetooth_gatt.php)
 
 ## License
