@@ -141,7 +141,7 @@ Napi::Value NobleMac::Read(const Napi::CallbackInfo& info) {
 // write(deviceUuid, serviceUuid, characteristicUuid, data, withoutResponse)
 Napi::Value NobleMac::Write(const Napi::CallbackInfo& info) {
     CHECK_MANAGER()
-    ARG4(String, String, String, Buffer)
+    ARG4(String, String, String, Buffer /*, Boolean */)
     auto uuid = napiToUuidString(info[0].As<Napi::String>());
     auto service = napiToUuidString(info[1].As<Napi::String>());
     auto characteristic = napiToUuidString(info[2].As<Napi::String>());
