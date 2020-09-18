@@ -615,6 +615,20 @@ For example, to specify `hci1`:
 sudo NOBLE_HCI_DEVICE_ID=1 node <your file>.js
 ```
 
+If you are using multiple HCI devices in one setup you can run two instances of noble with different binding configurations by initializing them seperatly in code:
+
+```
+const HCIBindings = require('noble/lib/hci-socket/bindings');
+const Noble = require('noble/lib/noble');
+
+const params = {
+  deviceId: 0,
+  userChannel: true
+};
+
+const noble = new Noble(new HCIBindings(params));
+```
+
 ### Reporting all HCI events (Linux-specific)
 
 By default, noble waits for both the advertisement data and scan response data for each Bluetooth address. If your device does not use scan response, the `NOBLE_REPORT_ALL_HCI_EVENTS` environment variable can be used to bypass it.
