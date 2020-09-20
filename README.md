@@ -312,6 +312,12 @@ __Note:__ On OS X, the address will be set to 'unknown' if the device has not be
 noble.on('warning', callback(message));
 ```
 
+### Reset device
+
+```javascript
+noble.reset()
+```
+
 ### Peripheral
 
 #### Connect
@@ -319,6 +325,8 @@ noble.on('warning', callback(message));
 ```javascript
 peripheral.connect([callback(error)]);
 ```
+
+Some of the bluetooth devices doesn't connect seamlessly, may be because of bluetooth device firmware or kernel. Do reset the device with noble.reset() API before connect API.
 
 #### _Event: Connected_
 
