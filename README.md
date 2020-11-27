@@ -303,7 +303,7 @@ noble.on('discover', callback(peripheral));
   };
   ```
 
-__Note:__ On OS X, the address will be set to 'unknown' if the device has not been connected previously.
+__Note:__ On macOS, the address will be set to '' if the device has not been connected previously.
 
 
 #### _Event: Warning raised_
