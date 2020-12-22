@@ -1,7 +1,20 @@
 require('should');
 const sinon = require('sinon');
 
+const tryRequire = modulePath => {
+  try {
+    return require(modulePath);
+  } catch (e) {
+    console.error(`ERROR:\tCould not load manufacturer list from "${modulePath}".`);
+    console.error(`\tPlease see "${__dirname}/../scripts/manufactures/README.md" for instructions.`);
+    return false;
+  }
+};
+
 const Manufacture = require('../lib/manufacture');
+
+const manufacturersCodesHex = tryRequire('../lib/manufactures-hex.json');
+const manufacturersCodesDec = tryRequire('../lib/manufactures-dec.json');
 
 const GARMIN_MAN_NAME = 'Garmin International, Inc.';
 const GARMIN_MAN_HEX = '87 00 0d 9c';
@@ -17,6 +30,11 @@ describe('Manufacture', function () {
   let manufactureApple = null;
 
   beforeEach(function () {
+
+    if (manufacturersCodesDec === false || manufacturersCodesHex === false) {
+      this.skip();
+    }
+
     mockNoble = {
       readValue: sinon.spy(),
       writeValue: sinon.spy()
