@@ -30,7 +30,6 @@ describe('Manufacture', function () {
   let manufactureApple = null;
 
   beforeEach(function () {
-
     if (manufacturersCodesDec === false || manufacturersCodesHex === false) {
       this.skip();
     }
