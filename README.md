@@ -61,6 +61,7 @@ noble.on('discover', async (peripheral) => {
 #### OS X
 
  * Install [Xcode](https://itunes.apple.com/ca/app/xcode/id497799835?mt=12)
+ * On newer versions of OSX, allow bluetooth access on the terminal app: "System Preferences" —> "Security & Privacy" —> "Bluetooth" -> Add terminal app (see [Sandboxed terminal](https://github.com/abandonware/noble#sandboxed-terminal))
 
 #### Linux
 
@@ -651,6 +652,12 @@ This limit is imposed by the Bluetooth adapter hardware as well as its firmware.
 | :------- | --- |
 | OS X 10.11 (El Capitan) | 6 |
 | Linux/Windows - Adapter-dependent | 5 (CSR based adapter) |
+
+### Sandboxed terminal
+
+On newer versions of OSX, the terminal app is sandboxed to not allow bluetooth connections by default. If you run a script that tries to access it, you will get an `Abort trap: 6` error.
+
+To enable bluetooth, go to "System Preferences" —> "Security & Privacy" —> "Bluetooth" -> Add your terminal into allowed apps.
 
 ### Adapter-specific known issues
 
