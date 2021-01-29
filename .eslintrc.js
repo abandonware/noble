@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  extends: ["eslint:recommended", "semistandard"],
+  extends: ['eslint:recommended', 'semistandard'],
   parserOptions: {
     ecmaVersion: 2017
   },
@@ -13,12 +13,12 @@ module.exports = {
     Promise: true
   },
   rules: {
-    "no-unused-vars": [
-      "error",
+    'no-unused-vars': [
+      'error',
       {
-        args: "none"
+        args: 'none'
       }
     ],
-    "semi": "error"
+    semi: 'error'
   }
 };

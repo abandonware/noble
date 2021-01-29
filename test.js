@@ -1,4 +1,4 @@
-var noble = require('./index');
+const noble = require('./index');
 
 console.log('noble');
 
@@ -42,7 +42,7 @@ noble.on('discover', function (peripheral) {
   peripheral.on('servicesDiscover', function (services) {
     console.log('on -> peripheral services discovered ' + services);
 
-    var serviceIndex = 0;
+    const serviceIndex = 0;
 
     services[serviceIndex].on('includedServicesDiscover', function (includedServiceUuids) {
       console.log('on -> service included services discovered ' + includedServiceUuids);
@@ -52,7 +52,7 @@ noble.on('discover', function (peripheral) {
     services[serviceIndex].on('characteristicsDiscover', function (characteristics) {
       console.log('on -> service characteristics discovered ' + characteristics);
 
-      var characteristicIndex = 0;
+      const characteristicIndex = 0;
 
       characteristics[characteristicIndex].on('read', function (data, isNotification) {
         console.log('on -> characteristic read ' + data + ' ' + isNotification);
@@ -82,7 +82,7 @@ noble.on('discover', function (peripheral) {
       characteristics[characteristicIndex].on('descriptorsDiscover', function (descriptors) {
         console.log('on -> descriptors discover ' + descriptors);
 
-        var descriptorIndex = 0;
+        const descriptorIndex = 0;
 
         descriptors[descriptorIndex].on('valueRead', function (data) {
           console.log('on -> descriptor value read ' + data);

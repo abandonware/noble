@@ -91,6 +91,11 @@ const findServices = function (noble, peripheral) {
   peripheral.discoverServices([], (error, services) => {
     let sensorCharacteristic;
 
+    if (error) {
+      console.log('Error on service discovery', error);
+      return;
+    }
+
     servicesToRead = services.length;
     // we found the list of services, now trigger characteristics lookup for each of them:
 
@@ -108,6 +113,11 @@ const findServices = function (noble, peripheral) {
       });
 
       service.discoverCharacteristics([], function (error, characteristics) {
+        if (error) {
+          console.log('Error on characteristics discovery', error);
+          return;
+        }
+
         console.log(`SRV\t${service.uuid} characteristic decoded data: `);
         for (let j = 0; j < characteristics.length; j++) {
           const ch = characteristics[j];

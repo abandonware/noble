@@ -1,7 +1,7 @@
 /* jshint loopfunc: true */
-var WebSocket = require('ws');
+const WebSocket = require('ws');
 
-var noble = require('./index');
+const noble = require('./index');
 
 var serverMode = !process.argv[2];
 var port = 0xB1e;
