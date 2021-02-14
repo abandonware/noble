@@ -599,7 +599,7 @@ descriptor.once('valueWrite');
 By default, noble will select appropriate Bluetooth device bindings based on your platform. You can provide custom bindings using the `with-bindings` module.
 
 ```javascript
-var noble = require('noble/with-bindings')(require('./my-custom-bindings'));
+var noble = require('@abandonware/noble/with-bindings')(require('./my-custom-bindings'));
 ```
 
 ### Running without root/sudo (Linux-specific)
@@ -628,6 +628,20 @@ For example, to specify `hci1`:
 
 ```sh
 sudo NOBLE_HCI_DEVICE_ID=1 node <your file>.js
+```
+
+If you are using multiple HCI devices in one setup you can run two instances of noble with different binding configurations by initializing them seperatly in code:
+
+```
+const HCIBindings = require('@abandonware/noble/lib/hci-socket/bindings');
+const Noble = require('@abandonware/noble/lib/noble');
+
+const params = {
+  deviceId: 0,
+  userChannel: true
+};
+
+const noble = new Noble(new HCIBindings(params));
 ```
 
 ### Reporting all HCI events (Linux-specific)

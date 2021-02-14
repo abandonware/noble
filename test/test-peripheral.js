@@ -1,5 +1,6 @@
 require('should');
 const sinon = require('sinon');
+const { fake, assert } = sinon;
 
 const Peripheral = require('../lib/peripheral');
 
@@ -31,6 +32,7 @@ describe('Peripheral', function () {
 
   afterEach(function () {
     peripheral = null;
+    sinon.reset();
   });
 
   it('should have a id', function () {
@@ -67,7 +69,7 @@ describe('Peripheral', function () {
     it('should delegate to noble', function () {
       peripheral.connect();
 
-      mockNoble.connect.calledWithExactly(mockId).should.equal(true);
+      mockNoble.connect.calledWithExactly(mockId, undefined).should.equal(true);
     });
 
     it('should callback', function () {
@@ -79,6 +81,26 @@ describe('Peripheral', function () {
       peripheral.emit('connect');
 
       calledback.should.equal(true);
+    });
+
+    it('with options, no callback', function () {
+      const options = { options: true };
+
+      peripheral.connect(options);
+      peripheral.emit('connect');
+
+      mockNoble.connect.calledWithExactly(peripheral.id, options);
+    });
+
+    it('both options and callback', function () {
+      const options = { options: true };
+      const callback = fake.returns(null);
+
+      peripheral.connect(options, callback);
+      peripheral.emit('connect');
+
+      mockNoble.connect.calledWithExactly(peripheral.id, options).should.equal(true);
+      assert.calledOnce(callback);
     });
   });
 
@@ -105,7 +127,17 @@ describe('Peripheral', function () {
       peripheral.emit('connect');
       await promise;
 
-      mockNoble.connect.calledWithExactly(mockId).should.equal(true);
+      mockNoble.connect.calledWithExactly(mockId, undefined).should.equal(true);
+    });
+
+    it('with options', async () => {
+      const options = { options: true };
+
+      const promise = peripheral.connectAsync(options);
+      peripheral.emit('connect');
+      await promise;
+
+      mockNoble.connect.calledWithExactly(peripheral.id, options).should.equal(true);
     });
   });
 

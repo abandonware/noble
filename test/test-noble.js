@@ -16,6 +16,7 @@ describe('Noble', () => {
       init: () => {},
       on: () => {},
       setScanParameters: fake.returns(null),
+      connect: fake.returns(true),
       startScanning: sinon.spy(),
       stopScanning: sinon.spy()
     };
@@ -37,6 +38,8 @@ describe('Noble', () => {
       await promise;
 
       mockBindings.startScanning.calledWithExactly(expectedServiceUuids, expectedAllowDuplicates).should.equal(true);
+
+      assert.notCalled(mockBindings.connect);
     });
 
     it('should throw an error if not powered on', async () => {
@@ -45,6 +48,8 @@ describe('Noble', () => {
       noble.emit('scanStart');
 
       await promise.should.be.rejectedWith('Could not start scanning, state is poweredOff (not poweredOn)');
+
+      assert.notCalled(mockBindings.connect);
     });
 
     it('should resolve', async () => {
@@ -53,6 +58,8 @@ describe('Noble', () => {
       noble.emit('scanStart');
 
       await promise.should.be.resolved();
+
+      assert.notCalled(mockBindings.connect);
     });
   });
 
@@ -64,12 +71,28 @@ describe('Noble', () => {
       await promise;
 
       mockBindings.stopScanning.calledWithExactly().should.equal(true);
+
+      assert.notCalled(mockBindings.connect);
     });
 
     it('should resolve', async () => {
       const promise = noble.stopScanningAsync();
       noble.emit('scanStop');
       await promise.should.be.resolved();
+
+      assert.notCalled(mockBindings.connect);
+    });
+  });
+
+  describe('connect', () => {
+    it('should delegate to binding', () => {
+      const peripheralUuid = 'peripheral-uuid';
+      const parameters = {};
+
+      noble.connect(peripheralUuid, parameters);
+
+      assert.calledOnce(mockBindings.connect);
+      assert.calledWith(mockBindings.connect, peripheralUuid, parameters);
     });
   });
 
