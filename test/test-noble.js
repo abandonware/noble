@@ -17,6 +17,7 @@ describe('Noble', () => {
       on: () => {},
       setScanParameters: fake.returns(null),
       connect: fake.returns(true),
+      cancelConnect: fake.returns(null),
       startScanning: sinon.spy(),
       stopScanning: sinon.spy()
     };
@@ -107,6 +108,18 @@ describe('Noble', () => {
 
       assert.calledOnce(mockBindings.setScanParameters);
       assert.calledWith(mockBindings.setScanParameters, interval, window);
+    });
+  });
+
+  describe('cancelConnect', () => {
+    it('should delegate to binding', () => {
+      const peripheralUuid = 'peripheral-uuid';
+      const parameters = {};
+
+      noble.cancelConnect(peripheralUuid, parameters);
+
+      assert.calledOnce(mockBindings.cancelConnect);
+      assert.calledWith(mockBindings.cancelConnect, peripheralUuid, parameters);
     });
   });
 });

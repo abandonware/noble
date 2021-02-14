@@ -183,7 +183,8 @@ API structure:
 * [Peripheral](#peripheral)
   * [Connect](#connect)
   * [_Event: Connected_](#event-connected)
-  * [Disconnect or cancel a pending connection](#disconnect-or-cancel-a-pending-connection)
+  * [Cancel a pending connection](#cancel-a-pending-connection)
+  * [Disconnect](#disconnect)
   * [_Event: Disconnected_](#event-disconnected)
   * [Update RSSI](#update-rssi)
   * [_Event: RSSI updated_](#event-rssi-updated)
@@ -342,7 +343,14 @@ Some of the bluetooth devices doesn't connect seamlessly, may be because of blue
 peripheral.once('connect', callback);
 ```
 
-#### Disconnect or cancel a pending connection
+#### Cancel a pending connection
+
+```javascript
+peripheral.cancelConnect();
+// Will emit a 'connect' event with error
+```
+
+#### Disconnect
 
 ```javascript
 peripheral.disconnect([callback(error)]);

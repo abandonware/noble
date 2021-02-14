@@ -20,6 +20,7 @@ describe('Peripheral', function () {
   beforeEach(function () {
     mockNoble = {
       connect: sinon.spy(),
+      cancelConnect: fake.returns(null),
       disconnect: sinon.spy(),
       updateRssi: sinon.spy(),
       discoverServices: sinon.spy(),
@@ -138,6 +139,28 @@ describe('Peripheral', function () {
       await promise;
 
       mockNoble.connect.calledWithExactly(peripheral.id, options).should.equal(true);
+    });
+  });
+
+  describe('cancelConnect', () => {
+    it('not connecting, should resolve', async () => {
+      await peripheral.cancelConnect();
+
+      assert.notCalled(mockNoble.cancelConnect);
+    });
+
+    it('connecting, should emit connect with error', async () => {
+      const options = { options: true };
+      const connectCallback = fake.returns(null);
+
+      peripheral.connect(connectCallback);
+      peripheral.cancelConnect(options);
+
+      assert.calledOnce(connectCallback);
+      assert.calledWith(connectCallback, sinon.match({ message: 'connection canceled!' }));
+
+      assert.calledOnce(mockNoble.cancelConnect);
+      assert.calledWith(mockNoble.cancelConnect, peripheral.id, options);
     });
   });
 
