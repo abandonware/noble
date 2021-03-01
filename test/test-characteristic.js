@@ -115,7 +115,7 @@ describe('Characteristic', function () {
 
       (function () {
         characteristic.write(mockData);
-      }).should.throwError('data must be a Buffer');
+      }).should.throwError('data must be a Buffer or Uint8Array or Uint16Array or Uint32Array');
     });
 
     it('should delegate to noble, withoutResponse false', function () {
@@ -152,7 +152,7 @@ describe('Characteristic', function () {
     it('should only accept data as a buffer', async () => {
       mockData = {};
 
-      await characteristic.writeAsync(mockData).should.be.rejectedWith('data must be a Buffer');
+      await characteristic.writeAsync(mockData).should.be.rejectedWith('data must be a Buffer or Uint8Array or Uint16Array or Uint32Array');
     });
 
     it('should delegate to noble, withoutResponse false', async () => {
