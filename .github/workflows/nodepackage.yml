@@ -45,3 +45,33 @@ jobs:
       - name: Lint
         run: |
           npm run lint
+
+  quality:
+    name: Quality phase
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: 📇 Use npm cache
+        uses: c-hive/gha-npm-cache@v1
+      - name: Install dependencies (ubuntu-latest)
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt -qq update
+          sudo apt install -y g++-9
+          export CC="g++-9"
+      - name: 📦 Install NPM packages
+        run: |
+          npm install
+      - name: ✅ Test with coverage
+        run: |
+          npm run coverage
+      - name: 📄 Codecov report upload
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          file: .nyc_output/lcov.info

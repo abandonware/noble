@@ -6,10 +6,12 @@ lib-cov
 *.out
 *.pid
 *.gz
+.nyc_output
 
 pids
 logs
 results
+coverage
 
 build/
 node_modules/
