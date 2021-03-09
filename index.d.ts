@@ -147,8 +147,8 @@ export declare class Characteristic extends events.EventEmitter {
 
     read(callback?: (error: string, data: Buffer) => void): void;
     readAsync(): Promise<Buffer>;
-    write(data: Buffer, notify: boolean, callback?: (error: string) => void): void;
-    writeAsync(data: Buffer, notify: boolean): Promise<void>;
+    write(data: Buffer, withoutResponse: boolean, callback?: (error: string) => void): void;
+    writeAsync(data: Buffer, withoutResponse: boolean): Promise<void>;
     broadcast(broadcast: boolean, callback?: (error: string) => void): void;
     broadcastAsync(broadcast: boolean): Promise<void>;
     notify(notify: boolean, callback?: (error: string) => void): void;
