@@ -25,6 +25,7 @@ export declare function startScanning(serviceUUIDs?: string[], allowDuplicates?:
 export declare function startScanningAsync(serviceUUIDs?: string[], allowDuplicates?: boolean): Promise<void>;
 export declare function stopScanning(callback?: () => void): void;
 export declare function stopScanningAsync(): Promise<void>;
+export declare function reset(): void;
 
 export declare function on(event: "stateChange", listener: (state: string) => void): events.EventEmitter;
 export declare function on(event: "scanStart", listener: () => void): events.EventEmitter;
