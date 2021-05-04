@@ -53,6 +53,7 @@
     "install": "^0.13.0",
     "mocha": "^8.3.2",
     "node-gyp": "^7.1.2",
+    "nyc": "^15.1.0",
     "prettier": "^2.2.1",
     "proxyquire": "^2.1.3",
     "should": "~13.2.3",
@@ -60,9 +61,10 @@
     "ws": "^7.4.4"
   },
   "scripts": {
+    "coverage": "nyc npm test && nyc report --reporter=text-lcov > .nyc_output/coverage.lcov",
     "lint": "eslint \"**/*.js\"",
     "lint-fix": "eslint \"**/*.js\" --fix",
-    "test": "mocha -R spec test/*.js"
+    "test": "mocha -R spec test/*.js test/**/*.test.js"
   },
   "browser": {
     "./lib/resolve-bindings.js": "./lib/resolve-bindings-web.js"
