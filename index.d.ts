@@ -167,6 +167,7 @@ export declare class Characteristic extends events.EventEmitter {
     on(event: "write", withoutResponse: boolean, listener: (error: string) => void): this;
     on(event: "broadcast", listener: (state: string) => void): this;
     on(event: "notify", listener: (state: string) => void): this;
+    on(event: "data", listener: (data: Buffer, isNotification: boolean) => void): this;
     on(event: "descriptorsDiscover", listener: (descriptors: Descriptor[]) => void): this;
     on(event: string, listener: Function): this;
     on(event: string, option: boolean, listener: Function): this;
@@ -175,6 +176,7 @@ export declare class Characteristic extends events.EventEmitter {
     once(event: "write", withoutResponse: boolean, listener: (error: string) => void): this;
     once(event: "broadcast", listener: (state: string) => void): this;
     once(event: "notify", listener: (state: string) => void): this;
+    once(event: "data", listener: (data: Buffer, isNotification: boolean) => void): this;
     once(event: "descriptorsDiscover", listener: (descriptors: Descriptor[]) => void): this;
     once(event: string, listener: Function): this;
     once(event: string, option: boolean, listener: Function): this;
