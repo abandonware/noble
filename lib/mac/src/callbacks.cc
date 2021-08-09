@@ -6,8 +6,6 @@
 //
 #include "callbacks.h"
 
-#include <napi-thread-safe-callback.hpp>
-
 #define _s(val) Napi::String::New(env, val)
 #define _b(val) Napi::Boolean::New(env, val)
 #define _n(val) Napi::Number::New(env, val)
