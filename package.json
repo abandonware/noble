@@ -38,16 +38,16 @@
     "node-addon-api": "^3.2.0"
   },
   "optionalDependencies": {
-    "@abandonware/bluetooth-hci-socket": "^0.5.3-7"
+    "@abandonware/bluetooth-hci-socket": "^0.5.3-8"
   },
   "devDependencies": {
     "async": "^3.2.0",
     "eslint": "^7.27.0",
+    "eslint-config-semistandard": "^16.0.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.23.3",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
-    "eslint-plugin-standard": "^5.0.0",
     "install": "^0.13.0",
     "mocha": "^8.4.0",
     "@mapbox/node-pre-gyp": "^1.0.5",
