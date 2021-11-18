@@ -15,5 +15,15 @@
         }],
       ],
     },
+    {
+      'target_name': 'noble',
+      'conditions': [
+        ['OS=="win"', {
+          'dependencies': [
+            'lib/win/binding.gyp:binding',
+          ],
+        }],
+      ],
+    },
   ],
 }
