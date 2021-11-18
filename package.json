@@ -45,6 +45,7 @@
   },
   "devDependencies": {
     "@mapbox/node-pre-gyp": "^1.0.5",
+    "@types/bindings": "^1.5.1",
     "async": "^3.2.0",
     "eslint": "^7.27.0",
     "eslint-config-semistandard": "^16.0.0",
