@@ -12,11 +12,11 @@ class NobleMac {}
 class NobleWinrt {}
 
 const NobleMacImport = proxyquire('../lib/mac/bindings', {
-  bindings: () => ({ NobleMac })
+  'bindings': () => ({ NobleMac })
 });
 
 const NobleWinrtImport = proxyquire('../lib/win/bindings', {
-  bindings: () => ({ NobleWinrt })
+  'bindings': () => ({ NobleWinrt })
 });
 
 const WebSocket = require('../lib/websocket/bindings');
