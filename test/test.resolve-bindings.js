@@ -12,11 +12,11 @@ class NobleMac {}
 class NobleWinrt {}
 
 const NobleMacImport = proxyquire('../lib/mac/bindings', {
-  bindings: () => ({ NobleMac })
+  'node-gyp-build': () => ({ NobleMac })
 });
 
 const NobleWinrtImport = proxyquire('../lib/win/bindings', {
-  bindings: () => ({ NobleWinrt })
+  'node-gyp-build': () => ({ NobleWinrt })
 });
 
 const WebSocket = require('../lib/websocket/bindings');
