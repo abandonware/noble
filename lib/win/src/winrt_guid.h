@@ -2,7 +2,7 @@
 
 #include <winrt/base.h>
 
-#if 0
+#if _MSC_VER < 1920
 namespace std
 {
     template <> struct hash<winrt::guid>

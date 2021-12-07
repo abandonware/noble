@@ -1,6 +1,6 @@
 #include "winrt_guid.h"
 
-#if 0
+#if _MSC_VER < 1920
 namespace std
 {
     std::size_t hash<winrt::guid>::operator()(const winrt::guid& k) const
