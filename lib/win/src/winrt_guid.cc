@@ -1,5 +1,6 @@
 #include "winrt_guid.h"
 
+#if 0
 namespace std
 {
     std::size_t hash<winrt::guid>::operator()(const winrt::guid& k) const
@@ -8,3 +9,4 @@ namespace std
         return std::hash<std::wstring>()(str);
     }
 }
+#end
