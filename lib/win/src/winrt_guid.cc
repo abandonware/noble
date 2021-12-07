@@ -9,4 +9,4 @@ namespace std
         return std::hash<std::wstring>()(str);
     }
 }
-#end
+#endif
