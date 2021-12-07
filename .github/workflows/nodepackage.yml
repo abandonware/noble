@@ -43,5 +43,7 @@ jobs:
         run: |
           npm test
       - name: Lint
+        # eslint 7+ no longer works on Node 10
+        if: ${{ matrix.node != 10 }}
         run: |
           npm run lint
