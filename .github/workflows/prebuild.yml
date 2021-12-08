@@ -21,6 +21,8 @@ jobs:
             node: x64
           - name: linux
             os: ubuntu-latest
+          - name: windows
+            os: windows-2016
     name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
