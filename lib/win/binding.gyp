@@ -13,8 +13,8 @@
           'AdditionalOptions': ['/await', '/std:c++latest'],
         },
       },
-      'msvs_target_platform_version':'10.0.15063.0',
-      'msvs_target_platform_minversion':'10.0.15063.0',
+      'msvs_target_platform_version':'10.0.18362.0',
+      'msvs_target_platform_minversion':'10.0.18362.0',
       'conditions': [
         ['OS=="win"', { 'defines': [ '_HAS_EXCEPTIONS=1' ] }]
       ],

@@ -63,7 +63,7 @@ IAsyncOperation<Radio> RadioWatcher::GetRadios(std::set<winrt::hstring> ids)
             // Radio::RadioFromAsync throws if the device is not available (unplugged)
         }
     }
-    return bluetooth;
+    co_return bluetooth;
 }
 
 void RadioWatcher::OnRadioChanged()

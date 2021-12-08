@@ -35,7 +35,7 @@ bool NotifyMap::IsSubscribed(std::string uuid, GattCharacteristic characteristic
 void NotifyMap::Unsubscribe(std::string uuid, GattCharacteristic characteristic)
 {
     Key key = { uuid, characteristic.Service().Uuid(), characteristic.Uuid() };
-    auto& it = mNotifyMap.find(key);
+    auto it = mNotifyMap.find(key);
     if (it == mNotifyMap.end())
     {
         return;
