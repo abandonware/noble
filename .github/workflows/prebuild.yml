@@ -22,7 +22,7 @@ jobs:
           - name: linux
             os: ubuntu-latest
           - name: win32
-            os: windows-2019
+            os: windows-2016
     name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     steps:
