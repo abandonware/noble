@@ -84,10 +84,10 @@ export declare class Peripheral extends events.EventEmitter {
     discoverSomeServicesAndCharacteristicsAsync(serviceUUIDs: string[], characteristicUUIDs: string[]): Promise<ServicesAndCharacteristics>;
     cancelConnect(options?: object): void;
 
-    readHandle(handle: Buffer, callback: (error: string, data: Buffer) => void): void;
-    readHandleAsync(handle: Buffer): Promise<Buffer>;
-    writeHandle(handle: Buffer, data: Buffer, withoutResponse: boolean, callback: (error: string) => void): void;
-    writeHandleAsync(handle: Buffer, data: Buffer, withoutResponse: boolean): Promise<void>;
+    readHandle(handle: number, callback: (error: string, data: Buffer) => void): void;
+    readHandleAsync(handle: number): Promise<Buffer>;
+    writeHandle(handle: number, data: Buffer, withoutResponse: boolean, callback: (error: string) => void): void;
+    writeHandleAsync(handle: number, data: Buffer, withoutResponse: boolean): Promise<void>;
     toString(): string;
 
     on(event: "connect", listener: (error: string) => void): this;
