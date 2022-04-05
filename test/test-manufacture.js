@@ -1,3 +1,4 @@
+const path = require('path');
 require('should');
 const sinon = require('sinon');
 
@@ -6,7 +7,7 @@ const tryRequire = modulePath => {
     return require(modulePath);
   } catch (e) {
     console.error(`ERROR:\tCould not load manufacturer list from "${modulePath}".`);
-    console.error(`\tPlease see "${__dirname}/../scripts/manufactures/README.md" for instructions.`);
+    console.error(`\tPlease see "${path.join(__dirname, '..', 'scripts', 'manufactures', 'README.md')}" for instructions.`);
     return false;
   }
 };
