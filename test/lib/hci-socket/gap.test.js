@@ -18,12 +18,13 @@ describe('hci-socket gap', () => {
     should(gap._scanFilterDuplicates).equal(null);
     should(gap._discoveries).deepEqual({});
 
-    assert.callCount(hci.on, 5);
+    assert.callCount(hci.on, 6);
     assert.calledWithMatch(hci.on, 'error', sinon.match.func);
     assert.calledWithMatch(hci.on, 'leScanParametersSet', sinon.match.func);
     assert.calledWithMatch(hci.on, 'leScanEnableSet', sinon.match.func);
     assert.calledWithMatch(hci.on, 'leAdvertisingReport', sinon.match.func);
     assert.calledWithMatch(hci.on, 'leScanEnableSetCmd', sinon.match.func);
+    assert.calledWithMatch(hci.on, 'leExtendedAdvertisingReport', sinon.match.func);
   });
 
   it('setScanParameters', () => {
@@ -351,7 +352,7 @@ describe('hci-socket gap', () => {
       };
       should(gap._discoveries[address]).deepEqual(expectedDiscovery);
 
-      assert.calledOnceWithExactly(discoverCallback, status, address, addressType, expectedDiscovery.connectable, expectedDiscovery.advertisement, rssi);
+      assert.calledOnceWithExactly(discoverCallback, status, address, addressType, expectedDiscovery.connectable, expectedDiscovery.advertisement, rssi, false);
     });
 
     it('type === 0x04 / no eir / previously discovered', () => {
@@ -396,7 +397,52 @@ describe('hci-socket gap', () => {
       };
       should(gap._discoveries[address]).deepEqual(expectedDiscovery);
 
-      assert.calledOnceWithExactly(discoverCallback, status, address, addressType, expectedDiscovery.connectable, expectedDiscovery.advertisement, rssi);
+      assert.calledOnceWithExactly(discoverCallback, status, address, addressType, expectedDiscovery.connectable, expectedDiscovery.advertisement, rssi, false);
+    });
+
+    it('type === 0x06 / scannable', () => {
+      const hci = {
+        on: sinon.spy()
+      };
+
+      const status = 'status';
+      const type = 0x06;
+      const address = 'a:d:d:r:e:s:s';
+      const addressType = 'addressType';
+      const eir = [];
+      const rssi = 'rssi';
+
+      const discoverCallback = sinon.spy();
+
+      const advertisement = {
+        localName: 'localName',
+        txPowerLevel: 'txPowerLevel',
+        manufacturerData: 'manufacturerData',
+        serviceData: ['data'],
+        serviceUuids: ['uuids'],
+        solicitationServiceUuids: ['solicitation']
+      };
+      const count = 8;
+      const hasScanResponse = false;
+      const connectable = false;
+
+      const gap = new Gap(hci);
+      gap._discoveries[address] = { advertisement, count, hasScanResponse, connectable };
+      gap.on('discover', discoverCallback);
+      gap.onHciLeAdvertisingReport(status, type, address, addressType, eir, rssi);
+
+      const expectedDiscovery = {
+        address,
+        addressType,
+        connectable: true,
+        advertisement,
+        rssi,
+        count: count + 1,
+        hasScanResponse
+      };
+      should(gap._discoveries[address]).deepEqual(expectedDiscovery);
+
+      assert.calledOnceWithExactly(discoverCallback, status, address, addressType, expectedDiscovery.connectable, expectedDiscovery.advertisement, rssi, true);
     });
 
     it('type !== 0x04 / no eir', () => {

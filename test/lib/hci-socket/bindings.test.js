@@ -31,21 +31,26 @@ describe('hci-socket bindings', () => {
     './signaling': Signaling
   });
 
+  let bindings;
+  let clock;
+  const options = {};
+
   beforeEach(() => {
     sinon.stub(process, 'on');
     sinon.stub(process, 'exit');
+
+    bindings = new Bindings(options);
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
     process.on.restore();
     process.exit.restore();
+    clock.restore();
     sinon.reset();
   });
 
   it('constructor', () => {
-    const options = {};
-    const bindings = new Bindings(options);
-
     should(bindings._state).eql(null);
 
     should(bindings._addresses).deepEqual({});
@@ -72,7 +77,6 @@ describe('hci-socket bindings', () => {
 
   describe('onSigInt', () => {
     it('should exit', () => {
-      const bindings = new Bindings();
       const sigIntListeners = process.listeners('SIGINT');
       bindings.onSigIntBinded = sigIntListeners[sigIntListeners.length - 1];
       bindings.onSigInt();
@@ -80,7 +84,6 @@ describe('hci-socket bindings', () => {
     });
 
     it('should not exit', () => {
-      const bindings = new Bindings();
       bindings.onSigIntBinded = sinon.spy();
       bindings.onSigInt();
       assert.notCalled(process.exit);
@@ -88,7 +91,6 @@ describe('hci-socket bindings', () => {
   });
 
   it('setScanParameters', () => {
-    const bindings = new Bindings();
     bindings._gap.setScanParameters = fake.resolves(null);
 
     bindings.setScanParameters('interval', 'window');
@@ -99,7 +101,6 @@ describe('hci-socket bindings', () => {
 
   describe('startScanning', () => {
     it('no args', () => {
-      const bindings = new Bindings();
       bindings._gap.startScanning = fake.resolves(null);
 
       bindings.startScanning();
@@ -111,7 +112,6 @@ describe('hci-socket bindings', () => {
     });
 
     it('with args', () => {
-      const bindings = new Bindings();
       bindings._gap.startScanning = fake.resolves(null);
 
       bindings.startScanning(['uuid'], true);
@@ -124,7 +124,6 @@ describe('hci-socket bindings', () => {
   });
 
   it('stopScanning', () => {
-    const bindings = new Bindings();
     bindings._gap.stopScanning = fake.resolves(null);
 
     bindings.stopScanning();
@@ -134,7 +133,6 @@ describe('hci-socket bindings', () => {
 
   describe('connect', () => {
     it('missing peripheral, no queue', () => {
-      const bindings = new Bindings();
       bindings._hci.createLeConn = fake.resolves(null);
 
       bindings.connect('peripheralUuid', 'parameters');
@@ -146,7 +144,6 @@ describe('hci-socket bindings', () => {
     });
 
     it('existing peripheral, no queue', () => {
-      const bindings = new Bindings();
       bindings._hci.createLeConn = fake.resolves(null);
       bindings._addresses = {
         peripheralUuid: 'address'
@@ -164,7 +161,6 @@ describe('hci-socket bindings', () => {
     });
 
     it('missing peripheral, with queue', () => {
-      const bindings = new Bindings();
       bindings._pendingConnectionUuid = 'pending-uuid';
 
       bindings.connect('peripheralUuid', 'parameters');
@@ -175,7 +171,6 @@ describe('hci-socket bindings', () => {
 
   describe('disconnect', () => {
     it('missing handle', () => {
-      const bindings = new Bindings();
       bindings._hci.disconnect = fake.resolves(null);
 
       bindings.disconnect('peripheralUuid');
@@ -185,7 +180,6 @@ describe('hci-socket bindings', () => {
     });
 
     it('existing handle', () => {
-      const bindings = new Bindings();
       bindings._handles = {
         peripheralUuid: 'handle'
       };
@@ -200,7 +194,6 @@ describe('hci-socket bindings', () => {
 
   describe('cancel', () => {
     it('missing handle', () => {
-      const bindings = new Bindings();
       bindings._connectionQueue.push({ id: 'anotherPeripheralUuid' });
 
       bindings._hci.cancelConnect = fake.resolves(null);
@@ -214,7 +207,6 @@ describe('hci-socket bindings', () => {
     });
 
     it('existing handle', () => {
-      const bindings = new Bindings();
       bindings._handles = {
         peripheralUuid: 'handle'
       };
@@ -232,7 +224,6 @@ describe('hci-socket bindings', () => {
   });
 
   it('reset', () => {
-    const bindings = new Bindings();
     bindings._hci.reset = fake.resolves(null);
 
     bindings.reset();
@@ -242,8 +233,6 @@ describe('hci-socket bindings', () => {
 
   describe('updateRssi', () => {
     it('missing handle', () => {
-      const bindings = new Bindings();
-
       bindings._hci.readRssi = fake.resolves(null);
 
       bindings.updateRssi('peripheralUuid');
@@ -253,7 +242,6 @@ describe('hci-socket bindings', () => {
     });
 
     it('existing handle', () => {
-      const bindings = new Bindings();
       bindings._handles = {
         peripheralUuid: 'handle'
       };
@@ -267,7 +255,6 @@ describe('hci-socket bindings', () => {
   });
 
   it('init', () => {
-    const bindings = new Bindings();
     bindings._gap.on = fake.resolves(null);
     bindings._hci.on = fake.resolves(null);
     bindings._hci.init = fake.resolves(null);
@@ -283,7 +270,6 @@ describe('hci-socket bindings', () => {
 
   describe('onExit', () => {
     it('no handles', () => {
-      const bindings = new Bindings();
       bindings._gap.stopScanning = fake.resolves(null);
 
       bindings.onExit();
@@ -292,7 +278,6 @@ describe('hci-socket bindings', () => {
     });
 
     it('with handles', () => {
-      const bindings = new Bindings();
       bindings._gap.stopScanning = fake.resolves(null);
       bindings._hci.disconnect = fake.resolves(null);
 
@@ -309,7 +294,6 @@ describe('hci-socket bindings', () => {
     it('same state', () => {
       const stateChange = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings._state = 'state';
       bindings.on('stateChange', stateChange);
 
@@ -321,7 +305,6 @@ describe('hci-socket bindings', () => {
     it('new state', () => {
       const stateChange = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings._state = 'state';
       bindings.on('stateChange', stateChange);
 
@@ -334,7 +317,6 @@ describe('hci-socket bindings', () => {
     it('unauthorized', () => {
       const stateChange = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings._state = 'state';
       bindings.on('stateChange', stateChange);
 
@@ -347,7 +329,6 @@ describe('hci-socket bindings', () => {
     it('unsupported', () => {
       const stateChange = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings._state = 'state';
       bindings.on('stateChange', stateChange);
 
@@ -361,7 +342,6 @@ describe('hci-socket bindings', () => {
   it('onAddressChange', () => {
     const onAddressChange = fake.resolves(null);
 
-    const bindings = new Bindings();
     bindings.on('addressChange', onAddressChange);
 
     bindings.onAddressChange('newAddress');
@@ -373,7 +353,6 @@ describe('hci-socket bindings', () => {
   it('onScanParametersSet', () => {
     const onScanParametersSet = fake.resolves(null);
 
-    const bindings = new Bindings();
     bindings.on('scanParametersSet', onScanParametersSet);
 
     bindings.onScanParametersSet();
@@ -384,7 +363,6 @@ describe('hci-socket bindings', () => {
   it('onScanStart', () => {
     const onScanStart = fake.resolves(null);
 
-    const bindings = new Bindings();
     bindings.on('scanStart', onScanStart);
 
     bindings.onScanStart('filterDuplicates');
@@ -396,7 +374,6 @@ describe('hci-socket bindings', () => {
   it('onScanStop', () => {
     const onScanStop = fake.resolves(null);
 
-    const bindings = new Bindings();
     bindings.on('scanStop', onScanStop);
 
     bindings.onScanStop();
@@ -408,7 +385,6 @@ describe('hci-socket bindings', () => {
     it('new device, no scanServiceUuids', () => {
       const onDiscover = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings.on('discover', onDiscover);
 
       bindings._scanServiceUuids = [];
@@ -433,7 +409,6 @@ describe('hci-socket bindings', () => {
     it('new device, with matching scanServiceUuids', () => {
       const onDiscover = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings.on('discover', onDiscover);
 
       bindings._scanServiceUuids = ['service-uuid'];
@@ -460,7 +435,6 @@ describe('hci-socket bindings', () => {
     it('new device, with non-matching scanServiceUuids', () => {
       const onDiscover = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings.on('discover', onDiscover);
 
       bindings._scanServiceUuids = ['service-uuid'];
@@ -485,7 +459,6 @@ describe('hci-socket bindings', () => {
     it('new device, with service data on advertisement', () => {
       const onDiscover = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings.on('discover', onDiscover);
 
       bindings._scanServiceUuids = ['service-uuid'];
@@ -512,7 +485,6 @@ describe('hci-socket bindings', () => {
     it('new device, non matching service data on advertisement', () => {
       const onDiscover = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings.on('discover', onDiscover);
 
       bindings._scanServiceUuids = ['service-uuid'];
@@ -537,7 +509,6 @@ describe('hci-socket bindings', () => {
     it('new device, no services on advertisement', () => {
       const onDiscover = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings.on('discover', onDiscover);
 
       bindings._scanServiceUuids = ['service-uuid'];
@@ -560,7 +531,6 @@ describe('hci-socket bindings', () => {
     it('new device, undefined _scanServiceUuids', () => {
       const onDiscover = fake.resolves(null);
 
-      const bindings = new Bindings();
       bindings.on('discover', onDiscover);
 
       bindings._scanServiceUuids = undefined;
@@ -593,7 +563,6 @@ describe('hci-socket bindings', () => {
 
       const connectCallback = sinon.spy();
 
-      const bindings = new Bindings();
       bindings.on('connect', connectCallback);
       bindings.onLeConnComplete(status, handle, role, addressType, address);
 
@@ -609,9 +578,10 @@ describe('hci-socket bindings', () => {
 
       const connectCallback = sinon.spy();
 
-      const bindings = new Bindings();
       bindings.on('connect', connectCallback);
       bindings.onLeConnComplete(status, handle, role, addressType, address);
+
+      clock.tick(0);
 
       assert.calledOnce(AclStream);
       assert.calledOnce(Gatt);
@@ -638,7 +608,7 @@ describe('hci-socket bindings', () => {
 
       assert.calledOnceWithMatch(signalingOnSpy, 'connectionParameterUpdateRequest', sinon.match.func);
 
-      assert.calledOnceWithExactly(gattExchangeMtuSpy, 256);
+      assert.calledOnceWithExactly(gattExchangeMtuSpy);
 
       assert.calledOnceWithExactly(connectCallback, 'addresssplitbyseparator', null);
 
@@ -654,7 +624,6 @@ describe('hci-socket bindings', () => {
 
       const connectCallback = sinon.spy();
 
-      const bindings = new Bindings();
       bindings._pendingConnectionUuid = 'pending_uuid';
       bindings.on('connect', connectCallback);
       bindings.onLeConnComplete(status, handle, role, addressType, address);
@@ -677,7 +646,6 @@ describe('hci-socket bindings', () => {
 
       const connectCallback = sinon.spy();
 
-      const bindings = new Bindings();
       bindings._pendingConnectionUuid = 'pending_uuid';
       bindings.on('connect', connectCallback);
       bindings.onLeConnComplete(status, handle, role, addressType, address);
@@ -700,7 +668,6 @@ describe('hci-socket bindings', () => {
 
       const connectCallback = sinon.spy();
 
-      const bindings = new Bindings();
       bindings._connectionQueue = [{ id: 'queuedId', params: { p1: 'p1' } }];
       bindings._addresses = { queuedId: 'queuedAddress' };
       bindings._addresseTypes = { queuedId: 'queuedAddressType' };
@@ -719,7 +686,6 @@ describe('hci-socket bindings', () => {
     it('handle not found', () => {
       const disconnectCallback = sinon.spy();
 
-      const bindings = new Bindings();
       bindings.on('disconnect', disconnectCallback);
       bindings.onDisconnComplete('missing', 'reason');
 
@@ -740,8 +706,6 @@ describe('hci-socket bindings', () => {
       const signalingSpy = {
         removeAllListeners: sinon.spy()
       };
-
-      const bindings = new Bindings();
 
       // Init expected
       bindings._handles[uuid] = uuid;
@@ -782,7 +746,6 @@ describe('hci-socket bindings', () => {
         pushEncrypt: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._aclStreams[handle] = aclSpy;
       bindings.onEncryptChange(anotherHandle, encrypt);
 
@@ -796,7 +759,6 @@ describe('hci-socket bindings', () => {
         pushEncrypt: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._aclStreams[handle] = aclSpy;
       bindings.onEncryptChange(handle, encrypt);
 
@@ -809,7 +771,6 @@ describe('hci-socket bindings', () => {
         pushEncrypt: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._aclStreams[handle] = aclSpy;
       bindings.onEncryptChange(handle);
 
@@ -822,7 +783,6 @@ describe('hci-socket bindings', () => {
     const rssi = 'rssi';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('onMtu', callback);
     bindings.onMtu(address, rssi);
 
@@ -834,7 +794,6 @@ describe('hci-socket bindings', () => {
     const rssi = 'rssi';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings._handles[handle] = 'binding_handle';
     bindings.on('rssiUpdate', callback);
     bindings.onRssiRead(handle, rssi);
@@ -852,7 +811,6 @@ describe('hci-socket bindings', () => {
         push: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._aclStreams[handle] = aclSpy;
       bindings.onAclDataPkt(anotherHandle, cid, data);
 
@@ -867,7 +825,6 @@ describe('hci-socket bindings', () => {
         push: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._aclStreams[handle] = aclSpy;
       bindings.onAclDataPkt(handle, cid, data);
 
@@ -880,7 +837,6 @@ describe('hci-socket bindings', () => {
         push: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._aclStreams[handle] = aclSpy;
       bindings.onAclDataPkt(handle);
 
@@ -898,7 +854,6 @@ describe('hci-socket bindings', () => {
         addService: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.addService(peripheralUuid, service);
@@ -914,7 +869,6 @@ describe('hci-socket bindings', () => {
         addService: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.addService(peripheralUuid, service);
@@ -929,7 +883,6 @@ describe('hci-socket bindings', () => {
         addService: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.addService(peripheralUuid);
@@ -948,7 +901,6 @@ describe('hci-socket bindings', () => {
         discoverServices: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.discoverServices(peripheralUuid, uuids);
@@ -964,7 +916,6 @@ describe('hci-socket bindings', () => {
         discoverServices: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.discoverServices(peripheralUuid, uuids);
@@ -979,7 +930,6 @@ describe('hci-socket bindings', () => {
         discoverServices: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.discoverServices(peripheralUuid);
@@ -993,7 +943,6 @@ describe('hci-socket bindings', () => {
     const serviceUuids = 'serviceUuids';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('servicesDiscover', callback);
     bindings.onServicesDiscovered(address, serviceUuids);
 
@@ -1005,7 +954,6 @@ describe('hci-socket bindings', () => {
     const serviceUuids = 'serviceUuids';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('servicesDiscovered', callback);
     bindings.onServicesDiscoveredEX(address, serviceUuids);
 
@@ -1023,7 +971,6 @@ describe('hci-socket bindings', () => {
         discoverIncludedServices: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.discoverIncludedServices(peripheralUuid, serviceUuid, serviceUuids);
@@ -1040,7 +987,6 @@ describe('hci-socket bindings', () => {
         discoverIncludedServices: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.discoverIncludedServices(peripheralUuid, serviceUuid, serviceUuids);
@@ -1056,7 +1002,6 @@ describe('hci-socket bindings', () => {
         discoverIncludedServices: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.discoverIncludedServices(peripheralUuid, serviceUuid);
@@ -1071,7 +1016,6 @@ describe('hci-socket bindings', () => {
     const includedServiceUuids = 'includedServiceUuids';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('includedServicesDiscover', callback);
     bindings.onIncludedServicesDiscovered(address, serviceUuid, includedServiceUuids);
 
@@ -1089,7 +1033,6 @@ describe('hci-socket bindings', () => {
         addCharacteristics: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.addCharacteristics(peripheralUuid, serviceUuid, characteristics);
@@ -1106,7 +1049,6 @@ describe('hci-socket bindings', () => {
         addCharacteristics: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.addCharacteristics(peripheralUuid, serviceUuid, characteristics);
@@ -1121,7 +1063,6 @@ describe('hci-socket bindings', () => {
         addCharacteristics: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.addCharacteristics(peripheralUuid);
@@ -1141,7 +1082,6 @@ describe('hci-socket bindings', () => {
         discoverCharacteristics: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.discoverCharacteristics(peripheralUuid, serviceUuid, characteristicUuids);
@@ -1158,7 +1098,6 @@ describe('hci-socket bindings', () => {
         discoverCharacteristics: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.discoverCharacteristics(peripheralUuid, serviceUuid, characteristicUuids);
@@ -1174,7 +1113,6 @@ describe('hci-socket bindings', () => {
         discoverCharacteristics: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.discoverCharacteristics(peripheralUuid, serviceUuid);
@@ -1189,7 +1127,6 @@ describe('hci-socket bindings', () => {
     const characteristics = 'characteristics';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('characteristicsDiscover', callback);
     bindings.onCharacteristicsDiscovered(address, serviceUuid, characteristics);
 
@@ -1202,7 +1139,6 @@ describe('hci-socket bindings', () => {
     const characteristics = 'characteristics';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('characteristicsDiscovered', callback);
     bindings.onCharacteristicsDiscoveredEX(address, serviceUuid, characteristics);
 
@@ -1220,7 +1156,6 @@ describe('hci-socket bindings', () => {
         read: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.read(peripheralUuid, serviceUuid, characteristicUuid);
@@ -1237,7 +1172,6 @@ describe('hci-socket bindings', () => {
         read: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.read(peripheralUuid, serviceUuid, characteristicUuid);
@@ -1252,7 +1186,6 @@ describe('hci-socket bindings', () => {
         read: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.read(peripheralUuid);
@@ -1268,7 +1201,6 @@ describe('hci-socket bindings', () => {
     const data = 'data';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('read', callback);
     bindings.onRead(address, serviceUuid, characteristicUuid, data);
 
@@ -1289,7 +1221,6 @@ describe('hci-socket bindings', () => {
         write: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.write(peripheralUuid, serviceUuid, characteristicUuid, data, withoutResponse);
@@ -1308,7 +1239,6 @@ describe('hci-socket bindings', () => {
         write: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.write(peripheralUuid, serviceUuid, characteristicUuid, data, withoutResponse);
@@ -1323,7 +1253,6 @@ describe('hci-socket bindings', () => {
         write: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.write(peripheralUuid);
@@ -1338,7 +1267,6 @@ describe('hci-socket bindings', () => {
     const characteristicUuid = 'characteristics';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('write', callback);
     bindings.onWrite(address, serviceUuid, characteristicUuid);
 
@@ -1357,7 +1285,6 @@ describe('hci-socket bindings', () => {
         broadcast: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.broadcast(peripheralUuid, serviceUuid, characteristicUuid, broadcast);
@@ -1375,7 +1302,6 @@ describe('hci-socket bindings', () => {
         broadcast: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.broadcast(peripheralUuid, serviceUuid, characteristicUuid, broadcast);
@@ -1390,7 +1316,6 @@ describe('hci-socket bindings', () => {
         broadcast: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.broadcast(peripheralUuid);
@@ -1406,7 +1331,6 @@ describe('hci-socket bindings', () => {
     const state = 'data';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('broadcast', callback);
     bindings.onBroadcast(address, serviceUuid, characteristicUuid, state);
 
@@ -1425,7 +1349,6 @@ describe('hci-socket bindings', () => {
         notify: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.notify(peripheralUuid, serviceUuid, characteristicUuid, notify);
@@ -1443,7 +1366,6 @@ describe('hci-socket bindings', () => {
         notify: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.notify(peripheralUuid, serviceUuid, characteristicUuid, notify);
@@ -1458,7 +1380,6 @@ describe('hci-socket bindings', () => {
         notify: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.notify(peripheralUuid);
@@ -1474,7 +1395,6 @@ describe('hci-socket bindings', () => {
     const state = 'data';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('notify', callback);
     bindings.onNotify(address, serviceUuid, characteristicUuid, state);
 
@@ -1488,7 +1408,6 @@ describe('hci-socket bindings', () => {
     const data = 'data';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('read', callback);
     bindings.onNotification(address, serviceUuid, characteristicUuid, data);
 
@@ -1506,7 +1425,6 @@ describe('hci-socket bindings', () => {
         discoverDescriptors: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.discoverDescriptors(peripheralUuid, serviceUuid, characteristicUuid);
@@ -1523,7 +1441,6 @@ describe('hci-socket bindings', () => {
         discoverDescriptors: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.discoverDescriptors(peripheralUuid, serviceUuid, characteristicUuid);
@@ -1538,7 +1455,6 @@ describe('hci-socket bindings', () => {
         discoverDescriptors: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.discoverDescriptors(peripheralUuid);
@@ -1554,7 +1470,6 @@ describe('hci-socket bindings', () => {
     const descriptorUuids = 'descriptorUuids';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('descriptorsDiscover', callback);
     bindings.onDescriptorsDiscovered(address, serviceUuid, characteristicUuid, descriptorUuids);
 
@@ -1573,7 +1488,6 @@ describe('hci-socket bindings', () => {
         readValue: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.readValue(peripheralUuid, serviceUuid, characteristicUuid, descriptorUuid);
@@ -1591,7 +1505,6 @@ describe('hci-socket bindings', () => {
         readValue: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.readValue(peripheralUuid, serviceUuid, characteristicUuid, descriptorUuid);
@@ -1606,7 +1519,6 @@ describe('hci-socket bindings', () => {
         readValue: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.readValue(peripheralUuid);
@@ -1623,7 +1535,6 @@ describe('hci-socket bindings', () => {
     const data = 'data';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('valueRead', callback);
     bindings.onValueRead(address, serviceUuid, characteristicUuid, descriptorUuid, data);
 
@@ -1643,7 +1554,6 @@ describe('hci-socket bindings', () => {
         writeValue: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.writeValue(peripheralUuid, serviceUuid, characteristicUuid, descriptorUuid, data);
@@ -1662,7 +1572,6 @@ describe('hci-socket bindings', () => {
         writeValue: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.writeValue(peripheralUuid, serviceUuid, characteristicUuid, descriptorUuid, data);
@@ -1677,7 +1586,6 @@ describe('hci-socket bindings', () => {
         writeValue: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.writeValue(peripheralUuid);
@@ -1693,7 +1601,6 @@ describe('hci-socket bindings', () => {
     const descriptorUuid = 'descriptorUuid';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('valueWrite', callback);
     bindings.onValueWrite(address, serviceUuid, characteristicUuid, descriptorUuid);
 
@@ -1710,7 +1617,6 @@ describe('hci-socket bindings', () => {
         readHandle: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.readHandle(peripheralUuid, attHandle);
@@ -1726,7 +1632,6 @@ describe('hci-socket bindings', () => {
         readHandle: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.readHandle(peripheralUuid, attHandle);
@@ -1741,7 +1646,6 @@ describe('hci-socket bindings', () => {
         readHandle: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.readHandle(peripheralUuid);
@@ -1756,7 +1660,6 @@ describe('hci-socket bindings', () => {
     const data = 'data';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('handleRead', callback);
     bindings.onHandleRead(address, handle, data);
 
@@ -1775,7 +1678,6 @@ describe('hci-socket bindings', () => {
         writeHandle: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = anotherHandle;
       bindings._gatts[handle] = gatt;
       bindings.writeHandle(peripheralUuid, attHandle, data, withoutResponse);
@@ -1793,7 +1695,6 @@ describe('hci-socket bindings', () => {
         writeHandle: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.writeHandle(peripheralUuid, attHandle, data, withoutResponse);
@@ -1808,7 +1709,6 @@ describe('hci-socket bindings', () => {
         writeHandle: sinon.spy()
       };
 
-      const bindings = new Bindings();
       bindings._handles[peripheralUuid] = handle;
       bindings._gatts[handle] = gatt;
       bindings.writeHandle(peripheralUuid);
@@ -1822,7 +1722,6 @@ describe('hci-socket bindings', () => {
     const handle = 'handle';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('handleWrite', callback);
     bindings.onHandleWrite(address, handle);
 
@@ -1835,7 +1734,6 @@ describe('hci-socket bindings', () => {
     const data = 'data';
     const callback = sinon.spy();
 
-    const bindings = new Bindings();
     bindings.on('handleNotify', callback);
     bindings.onHandleNotify(address, handle, data);
 
@@ -1850,7 +1748,6 @@ describe('hci-socket bindings', () => {
     const supervisionTimeout = 'supervisionTimeout';
     const connUpdateLe = sinon.spy();
 
-    const bindings = new Bindings();
     bindings._hci.connUpdateLe = connUpdateLe;
     bindings.onConnectionParameterUpdateRequest(handle, minInterval, maxInterval, latency, supervisionTimeout);
 

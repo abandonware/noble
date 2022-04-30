@@ -105,6 +105,7 @@ describe('hci-socket hci', () => {
       hci.readLeBufferSize = sinon.spy();
       hci.readBdAddr = sinon.spy();
       hci.init = sinon.spy();
+      hci.setCodedPhySupport = sinon.spy();
 
       hci.on('stateChange', callback);
     });
@@ -128,6 +129,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.readLeHostSupported);
       assert.notCalled(hci.readLeBufferSize);
       assert.notCalled(hci.readBdAddr);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(hci.init);
       assert.notCalled(callback);
     });
@@ -152,6 +154,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.readLeHostSupported);
       assert.notCalled(hci.readLeBufferSize);
       assert.notCalled(hci.readBdAddr);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(callback);
     });
 
@@ -170,6 +173,30 @@ describe('hci-socket hci', () => {
       assert.calledOnceWithExactly(hci.readLeHostSupported);
       assert.calledOnceWithExactly(hci.readLeBufferSize);
       assert.calledOnceWithExactly(hci.readBdAddr);
+
+      assert.notCalled(hci.setCodedPhySupport);
+      assert.notCalled(hci._socket.removeAllListeners);
+      assert.notCalled(hci.init);
+      assert.notCalled(callback);
+    });
+
+    it('should init all with extended option', () => {
+      hci._socket.isDevUp.returns(true);
+      hci._isDevUp = false;
+      hci._state = undefined;
+      hci._isExtended = true;
+
+      hci.pollIsDevUp();
+
+      assert.calledOnceWithExactly(hci.setSocketFilter);
+      assert.calledOnceWithExactly(hci.setEventMask);
+      assert.calledOnceWithExactly(hci.setLeEventMask);
+      assert.calledOnceWithExactly(hci.readLocalVersion);
+      assert.calledOnceWithExactly(hci.writeLeHostSupported);
+      assert.calledOnceWithExactly(hci.readLeHostSupported);
+      assert.calledOnceWithExactly(hci.readLeBufferSize);
+      assert.calledOnceWithExactly(hci.readBdAddr);
+      assert.calledOnceWithExactly(hci.setCodedPhySupport);
 
       assert.notCalled(hci._socket.removeAllListeners);
       assert.notCalled(hci.init);
@@ -194,7 +221,18 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.readLeHostSupported);
       assert.notCalled(hci.readLeBufferSize);
       assert.notCalled(hci.readBdAddr);
+      assert.notCalled(hci.setCodedPhySupport);
     });
+  });
+
+  it('should write codedPhySupport command', () => {
+    hci.setCodedPhySupport();
+    assert.calledOnceWithExactly(hci._socket.write, Buffer.from([0x01, 0x31, 0x20, 0x03, 0x00, 0x05, 0x05]));
+  });
+
+  it('should write randomMAC command', () => {
+    hci.setRandomMAC();
+    assert.calledOnceWithExactly(hci._socket.write, Buffer.from([0x01, 0x05, 0x20, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00]));
   });
 
   it('should setSocketFilter', () => {
@@ -212,6 +250,11 @@ describe('hci-socket hci', () => {
     assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 3, 0x0c, 0]));
   });
 
+  it('should readSupportedCommands', () => {
+    hci.readSupportedCommands();
+    assert.calledOnceWithExactly(hci._socket.write, Buffer.from([0x01, 0x02, 0x10, 0x00]));
+  });
+
   it('should readLocalVersion', () => {
     hci.readLocalVersion();
     assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 1, 0x10, 0]));
@@ -227,9 +270,17 @@ describe('hci-socket hci', () => {
     assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 9, 0x10, 0]));
   });
 
-  it('should setLeEventMask', () => {
-    hci.setLeEventMask();
-    assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 1, 0x20, 8, 0x1f, 0, 0, 0, 0, 0, 0, 0]));
+  describe('setLeEventMask', () => {
+    it('should setLeEventMask', () => {
+      hci.setLeEventMask();
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 1, 0x20, 8, 0x1f, 0, 0, 0, 0, 0, 0, 0]));
+    });
+
+    it('should setLeEventMask for BLE5 (extended)', () => {
+      hci._isExtended = true;
+      hci.setLeEventMask();
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 1, 0x20, 8, 0x1f, 0xff, 0, 0, 0, 0, 0, 0]));
+    });
   });
 
   it('should readLeBufferSize', () => {
@@ -250,12 +301,24 @@ describe('hci-socket hci', () => {
   describe('setScanParameters', () => {
     it('should keep default parameters', () => {
       hci.setScanParameters();
-      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 0x0b, 0x20, 7, 1, 0x10, 0, 0x10, 0, 0, 0]));
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 0x0b, 0x20, 7, 1, 0x12, 0, 0x12, 0, 0, 0]));
+    });
+
+    it('should keep default parameters (extended)', () => {
+      hci._isExtended = true;
+      hci.setScanParameters();
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 0x41, 0x20, 0x0d, 0x00, 0x00, 0x05, 0x01, 0x12, 0x00, 0x12, 0x00, 0x01, 0x12, 0x00, 0x12, 0x00]));
     });
 
     it('should force parameters', () => {
       hci.setScanParameters(0x2222, 0x3333);
       assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 0x0b, 0x20, 7, 1, 0x22, 0x022, 0x33, 0x33, 0, 0]));
+    });
+
+    it('should force parameters (extended)', () => {
+      hci._isExtended = true;
+      hci.setScanParameters(0x2222, 0x3333);
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 0x41, 0x20, 0x0d, 0x00, 0x00, 0x05, 0x01, 0x22, 0x22, 0x33, 0x33, 0x01, 0x22, 0x22, 0x33, 0x33]));
     });
   });
 
@@ -265,9 +328,21 @@ describe('hci-socket hci', () => {
       assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 0x0c, 0x20, 2, 0, 0]));
     });
 
+    it('should keep default parameters (extended)', () => {
+      hci._isExtended = true;
+      hci.setScanEnabled();
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 0x42, 0x20, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]));
+    });
+
     it('should force parameters', () => {
       hci.setScanEnabled(true, true);
       assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 0x0c, 0x20, 2, 1, 1]));
+    });
+
+    it('should force parameters (extended)', () => {
+      hci._isExtended = true;
+      hci.setScanEnabled(true, true);
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([1, 0x42, 0x20, 0x06, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00]));
     });
   });
 
@@ -276,15 +351,32 @@ describe('hci-socket hci', () => {
       const address = 'aa:bb:cc:dd:ee';
       const addressType = 'random';
       hci.createLeConn(address, addressType);
-      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([0x01, 0x0d, 0x20, 0x19, 0x60, 0x00, 0x30, 0x00, 0x00, 0x01, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x00, 0x00, 0x06, 0x00, 0x0c, 0x00, 0x00, 0x00, 0xc8, 0x00, 0x04, 0x00, 0x06, 0x00]));
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([0x01, 0x0d, 0x20, 0x19, 0x60, 0x00, 0x30, 0x00, 0x00, 0x01, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x00, 0x00, 0x06, 0x00, 0x12, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x04, 0x00, 0x06, 0x00]));
     });
 
-    it('should oveeride default parameters', () => {
+    it('should keep default parameters (extended)', () => {
+      const address = 'aa:bb:cc:dd:ee';
+      const addressType = 'random';
+      hci._isExtended = true;
+      hci.createLeConn(address, addressType);
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([0x01, 0x43, 0x20, 0x2a, 0x00, 0x00, 0x01, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 0x00, 0x05, 0x60, 0x00, 0x60, 0x00, 0x06, 0x00, 0x12, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x60, 0x00, 0x06, 0x00, 0x12, 0x00, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x00, 0x00]));
+    });
+
+    it('should override default parameters', () => {
       const address = 'ee:dd:cc:bb:aa';
       const addressType = 'not_random';
       const parameters = { minInterval: 0x0060, maxInterval: 0x00c0, latency: 0x0010, timeout: 0x0c80 };
       hci.createLeConn(address, addressType, parameters);
       assert.calledOnceWithExactly(hci._socket.write, Buffer.from([0x01, 0x0d, 0x20, 0x19, 0x60, 0x00, 0x30, 0x00, 0x00, 0x00, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0x00, 0x00, 0x60, 0x00, 0xc0, 0x00, 0x10, 0x00, 0x80, 0x0c, 0x04, 0x00, 0x06, 0x00]));
+    });
+
+    it('should override default parameters (extended)', () => {
+      const address = 'ee:dd:cc:bb:aa';
+      const addressType = 'not_random';
+      const parameters = { minInterval: 0x0060, maxInterval: 0x00c0, latency: 0x0010, timeout: 0x0c80 };
+      hci._isExtended = true;
+      hci.createLeConn(address, addressType, parameters);
+      assert.calledOnceWithExactly(hci._socket.write, Buffer.from([0x01, 0x43, 0x20, 0x2a, 0x00, 0x00, 0x00, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0x00, 0x05, 0x60, 0x00, 0x60, 0x00, 0x60, 0x00, 0xc0, 0x00, 0x10, 0x00, 0x80, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x60, 0x00, 0x60, 0x00, 0xc0, 0x00, 0x10, 0x00, 0x80, 0x0c, 0x00, 0x00, 0x00, 0x00]));
     });
   });
 
@@ -1003,6 +1095,7 @@ describe('hci-socket hci', () => {
       hci.setScanEnabled = sinon.spy();
       hci.setScanParameters = sinon.spy();
       hci.readBufferSize = sinon.spy();
+      hci.setCodedPhySupport = sinon.spy();
 
       hci._aclBuffers = aclBuffers;
 
@@ -1038,6 +1131,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
       assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(rssiReadCallback);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1047,6 +1141,7 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
     });
 
     it('should reset', () => {
@@ -1066,6 +1161,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
       assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(rssiReadCallback);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1075,6 +1171,38 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
+    });
+
+    it('should reset (extended)', () => {
+      const cmd = 3075;
+      const status = 0;
+      const result = Buffer.from([]);
+
+      hci._isExtended = true;
+      hci.processCmdCompleteEvent(cmd, status, result);
+
+      // called
+      assert.calledOnceWithExactly(hci.setEventMask);
+      assert.calledOnceWithExactly(hci.setLeEventMask);
+      assert.calledOnceWithExactly(hci.readLocalVersion);
+      assert.calledOnceWithExactly(hci.readBdAddr);
+      assert.calledOnceWithExactly(hci.setCodedPhySupport);
+
+      // not called
+      assert.notCalled(hci.setScanEnabled);
+      assert.notCalled(hci.setScanParameters);
+      assert.notCalled(hci.readBufferSize);
+      assert.notCalled(rssiReadCallback);
+      assert.notCalled(leScanEnableSetCallback);
+      assert.notCalled(leScanParametersSetCallback);
+      assert.notCalled(stateChangeCallback);
+      assert.notCalled(addressChangeCallback);
+      assert.notCalled(readLocalVersionCallback);
+
+      // hci checks
+      should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(true);
     });
 
     it('should only log debug - READ_LE_HOST_SUPPORTED_CMD', () => {
@@ -1094,6 +1222,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
       assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(rssiReadCallback);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1103,6 +1232,7 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
     });
 
     it('should do nothing - READ_LE_HOST_SUPPORTED_CMD', () => {
@@ -1122,6 +1252,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
       assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(rssiReadCallback);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1131,6 +1262,7 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
     });
 
     it('should emit stateChange - READ_LOCAL_VERSION_CMD', () => {
@@ -1152,6 +1284,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
       assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(rssiReadCallback);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1159,6 +1292,7 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
     });
 
     it('should not emit stateChange - READ_LOCAL_VERSION_CMD', () => {
@@ -1179,6 +1313,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.readLocalVersion);
       assert.notCalled(hci.readBdAddr);
       assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(rssiReadCallback);
       assert.notCalled(stateChangeCallback);
       assert.notCalled(leScanEnableSetCallback);
@@ -1187,6 +1322,7 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
     });
 
     it('should not scan - READ_LOCAL_VERSION_CMD', () => {
@@ -1208,6 +1344,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
       assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(rssiReadCallback);
       assert.notCalled(stateChangeCallback);
       assert.notCalled(leScanEnableSetCallback);
@@ -1216,6 +1353,38 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
+    });
+
+    it('should change extended - READ_SUPPORTED_COMMANDS_CMD', () => {
+      const cmd = 4098;
+      const status = 0;
+      const result = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 28, 30, 31, 32, 33, 34, 35, 35, 36, 0xff]);
+
+      hci._state = 'poweredOn';
+      hci.processCmdCompleteEvent(cmd, status, result);
+
+      // called
+
+      // not called
+      assert.notCalled(readLocalVersionCallback);
+      assert.notCalled(hci.setEventMask);
+      assert.notCalled(hci.setLeEventMask);
+      assert.notCalled(hci.readLocalVersion);
+      assert.notCalled(hci.readBdAddr);
+      assert.notCalled(hci.setScanEnabled);
+      assert.notCalled(hci.setScanParameters);
+      assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
+      assert.notCalled(rssiReadCallback);
+      assert.notCalled(stateChangeCallback);
+      assert.notCalled(leScanEnableSetCallback);
+      assert.notCalled(leScanParametersSetCallback);
+      assert.notCalled(addressChangeCallback);
+
+      // hci checks
+      should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(32);
     });
 
     it('should emit addressChange - READ_BD_ADDR_CMD', () => {
@@ -1238,6 +1407,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
       assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(rssiReadCallback);
       assert.notCalled(stateChangeCallback);
       assert.notCalled(leScanEnableSetCallback);
@@ -1246,64 +1416,71 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
       should(hci.addressType).equal('public');
       should(hci.address).equal('07:06:05:04:03:02:01:09');
     });
 
-    it('should emit stateChange - LE_SET_SCAN_PARAMETERS_CMD', () => {
-      const cmd = 8203;
-      const status = 0;
-      const result = Buffer.from([9, 1, 2, 3, 4, 5, 6, 7]);
+    [8203, 8257].forEach((cmd) => {
+      it(`should emit stateChange - LE_SET_SCAN_PARAMETERS_CMD - ${cmd}`, () => {
+        const status = 0;
+        const result = Buffer.from([9, 1, 2, 3, 4, 5, 6, 7]);
 
-      hci.processCmdCompleteEvent(cmd, status, result);
+        hci.processCmdCompleteEvent(cmd, status, result);
 
-      // called
-      assert.calledOnceWithExactly(stateChangeCallback, 'poweredOn');
-      assert.calledOnceWithExactly(leScanParametersSetCallback);
+        // called
+        assert.calledOnceWithExactly(stateChangeCallback, 'poweredOn');
+        assert.calledOnceWithExactly(leScanParametersSetCallback);
 
-      // not called
-      assert.notCalled(addressChangeCallback);
-      assert.notCalled(hci.setEventMask);
-      assert.notCalled(hci.setLeEventMask);
-      assert.notCalled(hci.readLocalVersion);
-      assert.notCalled(hci.readBdAddr);
-      assert.notCalled(hci.setScanEnabled);
-      assert.notCalled(hci.setScanParameters);
-      assert.notCalled(hci.readBufferSize);
-      assert.notCalled(rssiReadCallback);
-      assert.notCalled(leScanEnableSetCallback);
-      assert.notCalled(readLocalVersionCallback);
+        // not called
+        assert.notCalled(addressChangeCallback);
+        assert.notCalled(hci.setEventMask);
+        assert.notCalled(hci.setLeEventMask);
+        assert.notCalled(hci.readLocalVersion);
+        assert.notCalled(hci.readBdAddr);
+        assert.notCalled(hci.setScanEnabled);
+        assert.notCalled(hci.setScanParameters);
+        assert.notCalled(hci.readBufferSize);
+        assert.notCalled(hci.setCodedPhySupport);
+        assert.notCalled(rssiReadCallback);
+        assert.notCalled(leScanEnableSetCallback);
+        assert.notCalled(readLocalVersionCallback);
 
-      // hci checks
-      should(hci._aclBuffers).deepEqual(aclBuffers);
+        // hci checks
+        should(hci._aclBuffers).deepEqual(aclBuffers);
+        should(hci._isExtended).equal(false);
+      });
     });
 
-    it('should emit leScanEnableSet - LE_SET_SCAN_ENABLE_CMD', () => {
-      const cmd = 8204;
-      const status = 4;
-      const result = Buffer.from([9, 1, 2, 3, 4, 5, 6, 7]);
+    [8204, 8258].forEach((cmd) => {
+      it(`should emit leScanEnableSet - LE_SET_SCAN_ENABLE_CMD - ${cmd}`, () => {
+        const status = 4;
+        const result = Buffer.from([9, 1, 2, 3, 4, 5, 6, 7]);
 
-      hci.processCmdCompleteEvent(cmd, status, result);
+        hci.processCmdCompleteEvent(cmd, status, result);
 
-      // called
-      assert.calledOnceWithExactly(leScanEnableSetCallback, status);
+        // called
+        assert.calledOnceWithExactly(leScanEnableSetCallback, status);
 
-      // not called
-      assert.notCalled(addressChangeCallback);
-      assert.notCalled(hci.setEventMask);
-      assert.notCalled(hci.setLeEventMask);
-      assert.notCalled(hci.readLocalVersion);
-      assert.notCalled(hci.readBdAddr);
-      assert.notCalled(hci.setScanEnabled);
-      assert.notCalled(hci.setScanParameters);
-      assert.notCalled(hci.readBufferSize);
-      assert.notCalled(rssiReadCallback);
-      assert.notCalled(stateChangeCallback);
-      assert.notCalled(leScanParametersSetCallback);
-      assert.notCalled(readLocalVersionCallback);
+        // not called
+        assert.notCalled(addressChangeCallback);
+        assert.notCalled(hci.setEventMask);
+        assert.notCalled(hci.setLeEventMask);
+        assert.notCalled(hci.readLocalVersion);
+        assert.notCalled(hci.readBdAddr);
+        assert.notCalled(hci.setScanEnabled);
+        assert.notCalled(hci.setScanParameters);
+        assert.notCalled(hci.readBufferSize);
+        assert.notCalled(hci.setCodedPhySupport);
+        assert.notCalled(rssiReadCallback);
+        assert.notCalled(stateChangeCallback);
+        assert.notCalled(leScanParametersSetCallback);
+        assert.notCalled(readLocalVersionCallback);
 
-      // hci checks
-      should(hci._aclBuffers).deepEqual(aclBuffers);
+        // hci checks
+        should(hci._aclBuffers).deepEqual(aclBuffers);
+        should(hci._isExtended).equal(false);
+      });
     });
 
     it('should emit rssiRead - READ_RSSI_CMD', () => {
@@ -1325,6 +1502,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
       assert.notCalled(hci.readBufferSize);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(stateChangeCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1332,6 +1510,7 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
     });
 
     it('should read buffer size - LE_READ_BUFFER_SIZE_CMD', () => {
@@ -1353,6 +1532,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.readBdAddr);
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(stateChangeCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1360,6 +1540,7 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
     });
 
     it('should change buffers - LE_READ_BUFFER_SIZE_CMD', () => {
@@ -1381,6 +1562,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.readBdAddr);
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(stateChangeCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1391,6 +1573,7 @@ describe('hci-socket hci', () => {
         length: 1,
         num: 2
       });
+      should(hci._isExtended).equal(false);
     });
 
     it('should do nothing - LE_READ_BUFFER_SIZE_CMD', () => {
@@ -1412,6 +1595,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.readBdAddr);
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(stateChangeCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1419,6 +1603,7 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
     });
 
     it('should do nothing - READ_BUFFER_SIZE_CMD', () => {
@@ -1440,6 +1625,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.readBdAddr);
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(stateChangeCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1450,6 +1636,7 @@ describe('hci-socket hci', () => {
         length: 1,
         num: 2
       });
+      should(hci._isExtended).equal(false);
     });
 
     it('should do nothing - ??', () => {
@@ -1471,6 +1658,7 @@ describe('hci-socket hci', () => {
       assert.notCalled(hci.readBdAddr);
       assert.notCalled(hci.setScanEnabled);
       assert.notCalled(hci.setScanParameters);
+      assert.notCalled(hci.setCodedPhySupport);
       assert.notCalled(leScanEnableSetCallback);
       assert.notCalled(stateChangeCallback);
       assert.notCalled(leScanParametersSetCallback);
@@ -1478,6 +1666,7 @@ describe('hci-socket hci', () => {
 
       // hci checks
       should(hci._aclBuffers).deepEqual(aclBuffers);
+      should(hci._isExtended).equal(false);
     });
   });
 
@@ -1550,6 +1739,19 @@ describe('hci-socket hci', () => {
     should(hci._aclConnections.get(4404)).deepEqual({ pending: 0 });
   });
 
+  it('should emit leConnComplete on processLeEnhancedConnComplete', () => {
+    const status = 'status';
+    const data = Buffer.from([0x34, 0x11, 4, 1, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 2, 1, 4, 3, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]);
+    const callback = sinon.spy();
+
+    hci.on('leConnComplete', callback);
+    hci.processLeEnhancedConnComplete(status, data);
+
+    assert.calledOnceWithExactly(callback, status, 4404, 4, 'random', 'ff:ee:dd:cc:bb:aa', 5138.75, 4625, 51390, 21);
+    should(hci._aclConnections).keys(4404);
+    should(hci._aclConnections.get(4404)).deepEqual({ pending: 0 });
+  });
+
   describe('processLeAdvertisingReport', () => {
     it('should emit without error', () => {
       const count = 2;
@@ -1598,6 +1800,54 @@ describe('hci-socket hci', () => {
     });
   });
 
+  describe('processLeExtendedAdvertisingReport', () => {
+    it('should emit without error', () => {
+      const count = 2;
+      const data1 = Buffer.from([0, 1, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0]);
+      const data2 = Buffer.from([1, 0, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 4, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]);
+      const data = Buffer.concat([data1, data2]);
+      const callback = sinon.spy();
+
+      hci.on('leExtendedAdvertisingReport', callback);
+      hci.processLeExtendedAdvertisingReport(count, data);
+
+      assert.callCount(callback, 2);
+    });
+
+    it('should emit only once with random address', () => {
+      const count = 1;
+      const data = Buffer.from([0, 1, 1, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]);
+      const callback = sinon.spy();
+
+      hci.on('leExtendedAdvertisingReport', callback);
+      hci.processLeExtendedAdvertisingReport(count, data);
+
+      assert.calledOnceWithExactly(callback, 0, 256, 'ff:ee:dd:cc:bb:aa', 'random', 5, 6, Buffer.from([0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17]));
+    });
+
+    it('should emit only once with public address', () => {
+      const count = 1;
+      const data = Buffer.from([0, 1, 2, 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]);
+      const callback = sinon.spy();
+
+      hci.on('leExtendedAdvertisingReport', callback);
+      hci.processLeExtendedAdvertisingReport(count, data);
+
+      assert.calledOnceWithExactly(callback, 0, 256, 'aa:bb:cc:dd:ee:ff', 'public', 5, 6, Buffer.from([0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17]));
+    });
+
+    it('should catch error', () => {
+      const count = 1;
+      const data = Buffer.from([1, 0, 0xff, 0xee]);
+      const callback = sinon.spy();
+
+      hci.on('leExtendedAdvertisingReport', callback);
+      hci.processLeExtendedAdvertisingReport(count, data);
+
+      assert.notCalled(callback);
+    });
+  });
+
   it('processLeConnUpdateComplete', () => {
     const callback = sinon.spy();
     hci.on('leConnUpdateComplete', callback);
@@ -1607,7 +1857,7 @@ describe('hci-socket hci', () => {
   });
 
   describe('processCmdStatusEvent', () => {
-    it('shloud do nothing on bad cmd', () => {
+    it('should do nothing on bad cmd', () => {
       const callback = sinon.spy();
       hci.on('leConnComplete', callback);
       hci.processCmdStatusEvent(8206, 'status');
@@ -1615,20 +1865,22 @@ describe('hci-socket hci', () => {
       assert.notCalled(callback);
     });
 
-    it('shloud do nothing on bad status', () => {
-      const callback = sinon.spy();
-      hci.on('leConnComplete', callback);
-      hci.processCmdStatusEvent(8205, 0);
+    [8205, 8259].forEach((cmd) => {
+      it(`should do nothing on bad status - cmd = ${cmd}`, () => {
+        const callback = sinon.spy();
+        hci.on('leConnComplete', callback);
+        hci.processCmdStatusEvent(cmd, 0);
 
-      assert.notCalled(callback);
-    });
+        assert.notCalled(callback);
+      });
 
-    it('shloud emit event', () => {
-      const callback = sinon.spy();
-      hci.on('leConnComplete', callback);
-      hci.processCmdStatusEvent(8205, 'status');
+      it(`should emit event - cmd = ${cmd}`, () => {
+        const callback = sinon.spy();
+        hci.on('leConnComplete', callback);
+        hci.processCmdStatusEvent(cmd, 'status');
 
-      assert.calledOnceWithExactly(callback, 'status');
+        assert.calledOnceWithExactly(callback, 'status');
+      });
     });
   });
 
