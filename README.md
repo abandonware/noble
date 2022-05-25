@@ -133,7 +133,7 @@ See [@don](https://github.com/don)'s setup guide on [Bluetooth LE with Node.js a
 
 #### Docker
 
-Make sur your container runs with `--network=host` options and all specific environment preriquisites are verified.
+Make sure your container runs with `--network=host` options and all specific environment preriquisites are verified.
 
 ### Installing and using the package
 
