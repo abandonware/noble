@@ -82,6 +82,16 @@ Make sure `node` is on your `PATH`. If it's not, some options:
  * Symlink `nodejs` to `node`: `sudo ln -s /usr/bin/nodejs /usr/bin/node`
  * [Install Node.js using the NodeSource package](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
 
+If you are having trouble connecting to BLE devices on a Raspberry Pi, you should disable the `pnat` plugin. Add the following line at the bottom of `/etc/bluetooth/main.conf`:
+
+```
+DisablePlugins=pnat
+```
+
+Then restart the system.
+
+See [Issue #425 · OpenWonderLabs/homebridge-switchbot](https://github.com/OpenWonderLabs/homebridge-switchbot/issues/425#issuecomment-1190864279).
+
 ##### Fedora and other RPM-based distributions
 
 See the [generic Linux notes above](#linux) first.
