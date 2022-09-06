@@ -31,7 +31,7 @@ if (serverMode) {
     noble.on('stateChange', function (state) {
       sendEvent({
         type: 'stateChange',
-        state: state
+        state
       });
     });
 
@@ -204,7 +204,7 @@ noble.on('discover', function (peripheral) {
     sendEvent({
       type: 'rssiUpdate',
       peripheralUuid: this.uuid,
-      rssi: rssi
+      rssi
     });
   });
 
@@ -217,7 +217,7 @@ noble.on('discover', function (peripheral) {
         type: 'includedServicesDiscover',
         peripheralUuid: peripheral.uuid,
         serviceUuid: this.uuid,
-        includedServiceUuids: includedServiceUuids
+        includedServiceUuids
       });
     };
 
@@ -234,7 +234,7 @@ noble.on('discover', function (peripheral) {
           serviceUuid: service.uuid,
           characteristicUuid: characteristic.uuid,
           data: data.toString('hex'),
-          isNotification: isNotification
+          isNotification
         });
       };
 
@@ -257,7 +257,7 @@ noble.on('discover', function (peripheral) {
           peripheralUuid: peripheral.uuid,
           serviceUuid: service.uuid,
           characteristicUuid: characteristic.uuid,
-          state: state
+          state
         });
       };
 
@@ -269,7 +269,7 @@ noble.on('discover', function (peripheral) {
           peripheralUuid: peripheral.uuid,
           serviceUuid: service.uuid,
           characteristicUuid: characteristic.uuid,
-          state: state
+          state
         });
       };
 
@@ -356,7 +356,7 @@ noble.on('discover', function (peripheral) {
     sendEvent({
       type: 'servicesDiscover',
       peripheralUuid: this.uuid,
-      serviceUuids: serviceUuids
+      serviceUuids
     });
   });
 
@@ -364,7 +364,7 @@ noble.on('discover', function (peripheral) {
     sendEvent({
       type: 'handleRead',
       peripheralUuid: this.uuid,
-      handle: handle,
+      handle,
       data: data.toString('hex')
     });
   });
@@ -373,7 +373,7 @@ noble.on('discover', function (peripheral) {
     sendEvent({
       type: 'handleWrite',
       peripheralUuid: this.uuid,
-      handle: handle
+      handle
     });
   });
 
@@ -381,7 +381,7 @@ noble.on('discover', function (peripheral) {
     sendEvent({
       type: 'handleNotify',
       peripheralUuid: this.uuid,
-      handle: handle,
+      handle,
       data: data.toString('hex')
     });
   });
