@@ -145,8 +145,8 @@ describe('webbluetooth bindings', () => {
 
     const startCommand = {
       action: 'startScanning',
-      serviceUuids,
-      allowDuplicates
+      serviceUuids: serviceUuids,
+      allowDuplicates: allowDuplicates
     };
     assert.calledOnceWithExactly(callback);
     assert.calledOnceWithExactly(bindings._sendCommand, startCommand);
