@@ -25,7 +25,7 @@ noble.on('discover', function (peripheral) {
 
   if (entered) {
     inRange[id] = {
-      peripheral
+      peripheral: peripheral
     };
 
     console.log(
