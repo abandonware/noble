@@ -2,6 +2,7 @@
 #include "winrt_cpp.h"
 
 #include <winrt/Windows.Storage.Streams.h>
+#include <winrt/Windows.Foundation.Collections.h>
 using namespace winrt::Windows::Storage::Streams;
 
 using winrt::Windows::Devices::Bluetooth::BluetoothCacheMode;
@@ -43,6 +44,7 @@ void PeripheralWinrt::Update(const int rssiValue, const BluetoothLEAdvertisement
         advertismentType == BluetoothLEAdvertisementType::ConnectableDirected;
 
     manufacturerData.clear();
+
     for (auto ds : advertisment.DataSections())
     {
         if (ds.DataType() == BluetoothLEAdvertisementDataTypes::TxPowerLevel())

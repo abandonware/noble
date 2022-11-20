@@ -9,6 +9,7 @@
 
 #include "radio_watcher.h"
 #include "winrt_cpp.h"
+#include <winrt/Windows.Foundation.Collections.h>
 
 using winrt::Windows::Devices::Radios::RadioKind;
 using winrt::Windows::Foundation::AsyncStatus;

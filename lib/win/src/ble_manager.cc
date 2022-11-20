@@ -12,8 +12,10 @@
 #include <winrt/Windows.Storage.Streams.h>
 using winrt::Windows::Devices::Bluetooth::BluetoothCacheMode;
 using winrt::Windows::Devices::Bluetooth::BluetoothConnectionStatus;
+using winrt::Windows::Devices::Bluetooth::BluetoothLEDevice;
 using winrt::Windows::Storage::Streams::DataReader;
 using winrt::Windows::Storage::Streams::DataWriter;
+using winrt::Windows::Storage::Streams::IBuffer;
 
 template <typename T> auto inFilter(std::vector<T> filter, T object)
 {
@@ -190,7 +192,7 @@ bool BLEManager::Connect(const std::string& uuid)
     return true;
 }
 
-void BLEManager::OnConnected(IAsyncOperation<BluetoothLEDevice> asyncOp, AsyncStatus& status,
+void BLEManager::OnConnected(IAsyncOperation<BluetoothLEDevice> asyncOp, AsyncStatus status,
                              const std::string uuid)
 {
     if (status == AsyncStatus::Completed)
@@ -375,6 +377,7 @@ void BLEManager::OnCharacteristicsDiscovered(IAsyncOperation<GattCharacteristics
         auto result = asyncOp.GetResults();
         CHECK_RESULT(result);
         std::vector<std::pair<std::string, std::vector<std::string>>> characteristicsUuids;
+
         FOR(characteristic, result.Characteristics())
         {
             auto id = characteristic.Uuid();
