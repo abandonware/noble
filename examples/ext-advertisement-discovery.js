@@ -1,4 +1,4 @@
-const noble = require('../index');
+const noble = require('../with-custom-binding')({ extended: true });
 
 noble.on('stateChange', function (state) {
   if (state === 'poweredOn') {

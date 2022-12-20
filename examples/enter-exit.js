@@ -7,7 +7,7 @@
 
   based on code provided by: Mattias Ask (http://www.dittlof.com)
 */
-const noble = require('../index')({ extended: false });
+const noble = require('../index');
 
 const RSSI_THRESHOLD = -90;
 const EXIT_GRACE_PERIOD = 2000; // milliseconds

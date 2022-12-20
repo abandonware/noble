@@ -1,6 +1,6 @@
 /* eslint-disable handle-callback-err */
 const async = require('async');
-const noble = require('../index')({ extended: false });
+const noble = require('../index');
 
 const peripheralIdOrAddress = process.argv[2].toLowerCase();
 

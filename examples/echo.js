@@ -6,7 +6,7 @@
 // start an interval to write data to the characteristic
 
 // const noble = require('noble');
-const noble = require('..')({ extended: false });
+const noble = require('..');
 
 const ECHO_SERVICE_UUID = 'ec00';
 const ECHO_CHARACTERISTIC_UUID = 'ec0e';

@@ -23,7 +23,7 @@ __Note:__ macOS / Mac OS X, Linux, FreeBSD and Windows are currently the only su
 ```javascript
 // Read the battery level of the first found peripheral exposing the Battery Level characteristic
 
-const noble = require('@abandonware/noble')({extended: false});
+const noble = require('@abandonware/noble');
 
 noble.on('stateChange', async (state) => {
   if (state === 'poweredOn') {
@@ -42,6 +42,12 @@ noble.on('discover', async (peripheral) => {
   await peripheral.disconnectAsync();
   process.exit(0);
 });
+```
+## Use Noble With BLE5 Extended Features With HCI 
+
+```javascript
+const noble = require('@abandonware/noble/with-custom-binding')({extended: true});
+
 ```
 
 ## Installation
@@ -158,7 +164,7 @@ set BLUETOOTH_HCI_SOCKET_USB_PID=xxx
 ```
 
 ```javascript
-const noble = require('@abandonware/noble')({extended: false});
+const noble = require('@abandonware/noble');
 ```
 
 ## API docs
@@ -670,7 +676,7 @@ const Noble = require('@abandonware/noble/lib/noble');
 const params = {
   deviceId: 0,
   userChannel: true,
-  extended: false
+  extended: false //ble5 extended features
 };
 
 const noble = new Noble(new HCIBindings(params));

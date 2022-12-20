@@ -1,4 +1,4 @@
-const noble = require('../')({ extended: false });
+const noble = require('../');
 
 const peripheralIdOrAddress = process.argv[2].toLowerCase();
 
