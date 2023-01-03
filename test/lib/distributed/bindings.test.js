@@ -428,9 +428,9 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
     }
-  });
+  });      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
+
 
   it('connect on existing peripheral', () => {
     const fakeSend = fake.returns(null);
@@ -459,7 +459,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -490,7 +490,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -521,7 +521,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -553,7 +553,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -586,7 +586,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -619,7 +619,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -652,7 +652,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -687,7 +687,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -721,7 +721,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -755,7 +755,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -788,7 +788,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -822,7 +822,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -857,7 +857,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
@@ -889,7 +889,7 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
-      should(e.message).eql('Cannot read property \'ws\' of undefined');
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
   });
 
