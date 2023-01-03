@@ -13,23 +13,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-latest, macos-latest, windows-2019]
+        os: [ubuntu-20.04, ubuntu-latest, macos-latest, windows-2019]
         node: [12, 14, 16, 18]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - name: Install dependencies (ubuntu-18.04)
-        # Use g++-4.8 only on 'ubuntu-18.04'
-        if: ${{ matrix.os == 'ubuntu-18.04' }}
-        run: |
-          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-          sudo apt -qq update
-          sudo apt install -y g++-4.8
-          export CC="g++-4.8"
       - name: Install dependencies (ubuntu-latest)
-        # Use g++-9 only on versions after 'ubuntu-18.04'
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
