@@ -432,7 +432,6 @@ describe('distributed bindings', () => {
     }
   });
 
-
   it('connect on existing peripheral', () => {
     const fakeSend = fake.returns(null);
 
