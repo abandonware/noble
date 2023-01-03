@@ -6,7 +6,7 @@ jobs:
   post:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - id: log
         run: echo "::set-output name=message::$(git log --no-merges -1 --oneline)"
       - if: "contains(steps.log.outputs.message, 'Release ')"

@@ -14,10 +14,10 @@ jobs:
       - if: "contains(steps.log.outputs.message, 'Release ')"
         uses: actions/setup-node@master
         with:
-          node-version: 10.0.0
+          node-version: 16.0.0
       - if: "contains(steps.log.outputs.message, 'Release ')"
         uses: pascalgn/npm-publish-action@1.3.9
-        with: # All of theses inputs are optional
+        with: # All of these inputs are optional
           tag_name: "v%s"
           tag_message: "v%s"
           commit_pattern: "^Release (\\S+)"

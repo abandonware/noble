@@ -27,11 +27,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - if: matrix.node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 14.x
           architecture: ${{ matrix.node }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install dependencies (ubuntu-latest)
         # Use g++-9 only on versions after 'ubuntu-18.04'
         if: ${{ matrix.os == 'ubuntu-latest' }}
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@v2
         with:
           path: artifacts
