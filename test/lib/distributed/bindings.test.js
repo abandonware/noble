@@ -428,8 +428,9 @@ describe('distributed bindings', () => {
       assert.fail('Should throw an error');
     } catch (e) {
       should(e).instanceOf(Error);
+      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
     }
-  });      should(e.message.startsWith('Cannot read') && e.message.includes('\'ws\'') && e.message.includes('undefined')).eql(true);
+  });
 
 
   it('connect on existing peripheral', () => {
