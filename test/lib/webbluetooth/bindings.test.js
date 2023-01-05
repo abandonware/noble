@@ -97,7 +97,7 @@ describe('webbluetooth bindings', () => {
           uuid: device.id,
           address: device.id,
           advertisement: { localName: device.name }, // advertisement,
-          device: device,
+          device,
           cachedServices: {},
           localName: device.name,
           serviceUuids: options.services
@@ -128,7 +128,7 @@ describe('webbluetooth bindings', () => {
           uuid: device.id,
           address: device.id,
           advertisement: { localName: device.name }, // advertisement,
-          device: device,
+          device,
           cachedServices: {},
           localName: device.name,
           serviceUuids: [4660, 22136, 'service'],
