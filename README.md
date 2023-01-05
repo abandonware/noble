@@ -1,5 +1,7 @@
 # ![noble](assets/noble-logo.png)
 
+[![npm version](https://badgen.net/npm/v/@abandonware/noble)](https://www.npmjs.com/package/@abandonware/noble)
+[![npm downloads](https://badgen.net/npm/dt/@abandonware/noble)](https://www.npmjs.com/package/@abandonware/noble)
 [![Build Status](https://travis-ci.org/abandonware/noble.svg?branch=master)](https://travis-ci.org/abandonware/noble)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/abandonware/noble?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![OpenCollective](https://opencollective.com/noble/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/noble/sponsors/badge.svg)](#sponsors)
