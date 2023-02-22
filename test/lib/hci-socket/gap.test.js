@@ -1086,4 +1086,43 @@ describe('hci-socket gap', () => {
       assert.notCalled(discoverCallback);
     });
   });
+
+  it('should reset the service data on non scan responses', () => {
+    const hci = {
+      on: sinon.spy()
+    };
+
+    const status = 'status';
+    const address = 'a:d:d:r:e:s:s';
+    const addressType = 'addressType';
+    const rssi = 'rssi';
+
+    const eirType = 0x21;
+    const serviceUuid = Buffer.from([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]);
+    const serviceData = Buffer.from([0x05, 0x06]);
+    const eirLength = serviceUuid.length + serviceData.length + 1;
+    const eirLengthAndType = Buffer.from([eirLength, eirType]);
+    const eir = Buffer.concat([eirLengthAndType, serviceUuid, serviceData]);
+
+    const discoverCallback = sinon.spy();
+
+    const gap = new Gap(hci);
+    gap.on('discover', discoverCallback);
+    gap.onHciLeAdvertisingReport(status, 0x04, address, addressType, eir, rssi);
+
+    const expectedServiceData = [
+      {
+        uuid: '0f0e0d0c0b0a09080706050403020100',
+        data: serviceData
+      }
+    ];
+
+    should(gap._discoveries[address].advertisement.serviceData).deepEqual(expectedServiceData);
+
+    gap.onHciLeAdvertisingReport(status, 0x01, address, addressType, eir, rssi);
+
+    should(gap._discoveries[address].advertisement.serviceData).deepEqual(expectedServiceData);
+
+    assert.calledOnce(discoverCallback);
+  });
 });
