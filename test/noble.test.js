@@ -563,7 +563,7 @@ describe('noble', () => {
       should(noble._services).have.keys(uuid);
       should(noble._characteristics).have.keys(uuid);
       should(noble._descriptors).have.keys(uuid);
-      should(noble._discoveredPeripheralUUids).deepEqual([uuid]);
+      should(noble._discoveredPeripheralUUids).deepEqual({ uuid: true });
 
       assert.calledOnceWithExactly(eventCallback, peripheral);
     });
@@ -613,7 +613,7 @@ describe('noble', () => {
       should(noble._services).be.empty();
       should(noble._characteristics).be.empty();
       should(noble._descriptors).be.empty();
-      should(noble._discoveredPeripheralUUids).deepEqual([uuid]);
+      should(noble._discoveredPeripheralUUids).deepEqual({ uuid: true });
 
       assert.calledOnceWithExactly(eventCallback, peripheral);
     });
@@ -627,7 +627,7 @@ describe('noble', () => {
       const rssi = 'rssi';
 
       // register peripheral
-      noble._discoveredPeripheralUUids = [uuid];
+      noble._discoveredPeripheralUUids = { uuid: true };
       noble._allowDuplicates = true;
 
       const eventCallback = sinon.spy();
@@ -654,7 +654,7 @@ describe('noble', () => {
       const rssi = 'rssi';
 
       // register peripheral
-      noble._discoveredPeripheralUUids = [uuid];
+      noble._discoveredPeripheralUUids = { uuid: true };
 
       const eventCallback = sinon.spy();
       noble.on('discover', eventCallback);
