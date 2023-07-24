@@ -65,6 +65,7 @@ export declare class Peripheral extends events.EventEmitter {
     connectable: boolean;
     advertisement: Advertisement;
     rssi: number;
+    mtu: number | null;
     services: Service[];
     state: 'error' | 'connecting' | 'connected' | 'disconnecting' | 'disconnected';
 
