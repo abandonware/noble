@@ -1508,25 +1508,26 @@ describe('noble', () => {
     });
   });
 
-  it('onMtu - should update peripheral mtu', () => {
+  it('onMtu - should update peripheral mtu when set before already', () => {
     const peripheral = {
-      mtu: 'nan'
+      mtu: 234
     };
 
     noble._peripherals = { uuid: peripheral };
-    noble.onMtu('uuid', 'mtu');
+    noble.onMtu('uuid', 123);
 
-    should(peripheral).deepEqual({ mtu: 'mtu' });
+    should(peripheral).deepEqual({ mtu: 123 });
   });
 
-  it('onMtu - should not update peripheral mtu', () => {
+  it('onMtu - should update peripheral mtu too when empty', () => {
     const peripheral = {
+      mtu: null
     };
 
     noble._peripherals = { uuid: peripheral };
-    noble.onMtu('uuid', 'mtu');
+    noble.onMtu('uuid', 123);
 
-    should(peripheral).deepEqual({ });
+    should(peripheral).deepEqual({ mtu: 123 });
   });
 
   describe('onIncludedServicesDiscover', () => {
