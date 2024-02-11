@@ -41,7 +41,7 @@
     "node-gyp-build": "^4.5.0"
   },
   "optionalDependencies": {
-    "@abandonware/bluetooth-hci-socket": "^0.5.3-11"
+    "@abandonware/bluetooth-hci-socket": "^0.5.3-10"
   },
   "devDependencies": {
     "async": "^3.2.4",
