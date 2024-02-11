@@ -48,7 +48,7 @@ export declare function removeListener(event: string, listener: Function): event
 
 export declare function removeAllListeners(event?: string): events.EventEmitter;
 
-export declare var state: string;
+export var _state: string;
 
 export var _bindings: any;
 
