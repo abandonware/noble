@@ -136,12 +136,6 @@ Make sure you have read and write permissions on the `/dev/usb/*` device that co
 
 [node-gyp requirements for Windows](https://github.com/TooTallNate/node-gyp#installation)
 
-Install the required tools and configurations using Microsoft's [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools) from an elevated PowerShell or cmd.exe (run as Administrator).
-
-```cmd
-npm install --global --production windows-build-tools
-```
-
 [node-bluetooth-hci-socket prerequisites](#windows)
    * Compatible Bluetooth 5.0 Zephyr HCI-USB adapter (you need to add BLUETOOTH_HCI_SOCKET_USB_VID and BLUETOOTH_HCI_SOCKET_USB_PID to the process env)
    * Compatible Bluetooth 4.0 USB adapter
